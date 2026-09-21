@@ -1,0 +1,117 @@
+# Evidence and decisions
+
+## E001 - Reference inspection (2026-09-20)
+Empty project worktree with unborn main branch. Public TMP reference cloned to temporary storage;
+revision b8e1e4e7116943c826d3b59626059cd2b6d15923, identical to clean C:/projects/tmpsensor.
+Inspected Dash UI, session/acquisition architecture, CSV worker, HID codec and tests.
+TI HDC3020 datasheet SNAS778D and GUI v1.0.7 source verified command table, two CRC words,
+0x44 address, conversion timings and raw USB2ANY read/write payloads. See docs/protocol.md.
+No physical hardware discovery or access.
+
+## D001 - V1 design
+Reuse reference CSS and core software patterns; isolate sensor codec from USB packet codec.
+Single on-demand paired conversion each second by default. Use monotonic scheduling and UTC sample times.
+On CRC failures discard the whole pair; report failures and bound consecutive retries.
+Persist no sensor EEPROM settings. Simulation stays visibly identified in UI and CSV.
+
+## E002 - Software verification (2026-09-20 local / 2026-09-21 UTC)
+TEST-001/002/003/004: `python -m unittest discover -s tests -v`: **36 tests PASS**;
+see outputs/unit-tests.txt. Real HDC driver over a fake HID bridge also passes.
+Coverage: bridge CRC/framing/errors/sequence/discovery, both sensor CRCs, conversions,
+command/timing/identity/control behavior, serialized I/O and bounded command queue,
+pause/reconnect/cancellation, failed writes, retries, heater deadline, CSV queue
+overflow/disk-full/draining, plots and simulated Dash callback integration.
+Ruff check and formatting check pass. Python 3.12.14, Dash 3.4.0, Plotly 7.1.0,
+hidapi 0.15.0, Ruff 0.16.8; dependency versions captured by uv.lock.
+
+Windows sandbox/private-temp ACL interaction initially prevented CSV tests from
+opening their own temp directories. Same tests passed outside the sandbox; test
+assertions were not relaxed. No physical hardware was opened in either run.
+
+## E003 - Bounded simulation validation
+TEST-003/004: `python -m hdcsensor.validate --samples 30 --output outputs/simulation-validation` PASS.
+Report: outputs/simulation-validation/validation_20260921_030438_901402.json.
+30 pairs, median interval 0.999076 s (range 0.975828–1.019840 s), zero failed reads,
+zero dropped rows, exact CSV/value/timestamp agreement, clean close and successful
+identity-preserving reopen/close. Physical validation: false.
+
+## E004 - Browser verification
+Local Dash preview, simulator only. Verified paired live values, temperature/RH
+plots, zoom changes to held history, Follow live restores live mode, settings
+tab persistence, auto-mode apply, recording stop and visible download readiness.
+One saved browser CSV had 175 rows; final-layout run saved 77 rows with zero drops.
+Final-layout session reached 267 samples with zero failed reads before clean disconnect.
+Inspected full-page monitor and settings screenshots at the browser's available widths.
+
+Found unstable graph height when relying on Plotly's responsive default; fixed
+with an explicit 500 px graph container. Removed Plotly cloud-share toolbar action.
+Found simulator clock incorrectly re-anchored after a late auto read; corrected
+to autonomous periodic timing, covered by a regression test. These do not establish
+physical board timing. Browser callback errors during intentional server restart
+were resolved by reload. Embedded browser stalled on native heater dialog; replaced
+native dialogs with inline heater acknowledgement and direct documented soft reset.
+Final browser check confirmed acknowledgement gating, heater status on during the
+simulated pulse, automatic shutoff while sampling was paused, soft reset and resumed
+monitoring. Final preview is simulation, heater off, not recording.
+
+## D002 - Candidate boundary
+All meaningful hardware-free implementation and tests are complete. Retain explicit
+AWAITING_HUMAN_REVIEW gate; requested physical scope is initial identity/acquisition/
+CSV/close/reopen with heater kept off. Heater-on validation remains a separate scope.
+No physical accuracy, calibration, firmware compatibility or thermal behavior is claimed.
+
+## E005 - Review-gate checkpoint reconciliation (2026-09-20 22:17 America/Chicago)
+Applied H002 after reading AGENTS.md, PROJECT.md, STATE.md, the human-input record,
+candidate report and referenced evidence. Recomputed all source/configuration hashes:
+all 33 manifest entries match the current files, with no mismatches; the manifest
+digest also matches candidate `df63d639b78ab347692a7e789d91ec40972905c13d883df11c114b7e1ea6b74a`.
+Inspected outputs/unit-tests.txt (36 tests PASS) and E003's saved JSON (30 samples,
+0.999076 s median interval, no failed reads or dropped rows, successful close/reopen).
+These remain software/simulation evidence, not newly executed tests or physical evidence.
+Git status remains an uncommitted initial project. No in-flight external action or
+candidate-specific hardware approval was found. No implementation change or new
+hardware-independent gap was identified; E002/E003/E004 remain applicable.
+No physical discovery, initialization, sampling, actuation or cleanup was performed.
+Retain AWAITING_HUMAN_REVIEW under AGENTS.md; next useful action remains the prepared
+TEST-005 procedure after explicit approval. Do not infer approval from the loop prompt.
+
+## E006 - Pre-publication software review and cleanup (2026-09-20)
+Under H003, reviewed application callbacks, device/session ownership and cleanup,
+HID framing, sensor commands, simulation, recording, validation CLI, tests, docs,
+licenses and the publication file inventory. No hardware interaction occurred.
+Pruned 73 unused CSS selector branches inherited from TMP's register editor,
+draft/status widgets and removed decoration, plus unused settings-card h2/hr rules.
+Kept React Select and dynamic status styles. Removed redundant plot-range fallback
+and per-channel layout/empty-state setup discarded when composing the final plot.
+No device/session/recording changes or additional features were needed.
+
+TEST-001–004: 36 tests PASS in 3.735 s; outputs/review-unit-tests.txt. Ruff check,
+Ruff format check (22 Python files) and compileall PASS after cleanup. Existing
+format conventions restored after a mixed-newline edit; no assertions were relaxed.
+The before/after representative two-channel plot is identical except omission of
+an empty upper-axis title object (both display no title). Existing empty-plot,
+axis-range and HTTP integration tests pass. Browser reloaded updated CSS: computed
+display/padding/margin/color/background/font/grid styles on 36 selected elements
+were identical. Monitor and settings screenshots inspected; simulator running,
+heater off, no recording. Browser process retains its already loaded Python code;
+the updated plot helper was checked in the fresh test/figure processes.
+
+E003 remains applicable to unchanged acquisition/CSV/reconnect code. Original
+transcripts and simulation evidence are intentional records and retained. Scratch
+downloads, recordings, caches and virtual environment remain ignored, not published.
+Remote inspection (`git ls-remote --heads origin`) returned no branches; use the
+existing main branch for the initial commit. Sandbox Git SSH mapping restriction
+was resolved by the authorized read outside the sandbox.
+
+Candidate hashes now normalize CRLF to LF, preventing core.autocrlf=true from
+invalidating them on checkout. Digest method is explicit in candidate-manifest.json.
+Reviewed candidate: `8d6349c231c8ac62431c035b6507c3c2bd55c676258b945addb94280638515f2`.
+The earlier raw-byte manifest is superseded; prior E records retain their historical
+candidate reference. Publication does not approve hardware access.
+Final diff whitespace check identified trailing blank lines in seven text files;
+trimmed only those blank lines and regenerated the candidate manifest.
+Final staged diff inspected: 44 intentional files; no caches, scratch downloads,
+virtual environment or browser recordings included. All 33 manifest file hashes
+match both the worktree and Git index; candidate digest verified. `git diff --cached
+--check` PASS. `uv --cache-dir tmp/uv-review-cache lock --check --offline` PASS
+(33 packages); a workspace cache avoided the restricted user-cache ACL.
