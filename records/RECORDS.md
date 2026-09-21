@@ -115,3 +115,14 @@ virtual environment or browser recordings included. All 33 manifest file hashes
 match both the worktree and Git index; candidate digest verified. `git diff --cached
 --check` PASS. `uv --cache-dir tmp/uv-review-cache lock --check --offline` PASS
 (33 packages); a workspace cache avoided the restricted user-cache ACL.
+
+## E007 - Candidate committed and published (2026-09-20)
+Created initial commit `c1794ea92c06845903356b5d003da24961913a8e` on existing branch
+main after final staged-diff inspection. `git push -u origin main` succeeded;
+`git ls-remote --heads origin main` returned the same hash at refs/heads/main.
+Destination: git@github.com:cct1123/ti-hdc-sensor-monitor.git. No force push.
+This checkpoint update is a separate documentation commit; the reviewed source/
+configuration candidate remains `8d6349c231c8ac62431c035b6507c3c2bd55c676258b945addb94280638515f2`.
+For publication recovery, compare local HEAD, origin/main and the remote main ref;
+all must agree after the documentation commit is pushed. Physical validation remains
+UNTESTED and requires the candidate-specific approval in STATE.md.

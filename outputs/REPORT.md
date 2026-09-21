@@ -6,6 +6,7 @@ Candidate source/configuration hashes: [candidate-manifest.json](candidate-manif
 Candidate SHA256: `8d6349c231c8ac62431c035b6507c3c2bd55c676258b945addb94280638515f2`.
 File hashes normalize CRLF to LF so Windows and Git checkouts verify identically;
 the exact digest method is recorded in the manifest. Git publication is tracked in STATE.md.
+Implementation commit: `c1794ea92c06845903356b5d003da24961913a8e`, published on `main` (E007).
 
 ## Delivered
 

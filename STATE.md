@@ -1,16 +1,17 @@
 # Current checkpoint
 
 Phase: **AWAITING_HUMAN_REVIEW**
-Checkpoint: 2026-09-20 22:26 America/Chicago (2026-09-21 03:26 UTC)
+Checkpoint: 2026-09-20 22:29 America/Chicago (2026-09-21 03:29 UTC), E007
 Last applied human input: H003
-Owner: Codex software review/publication session, 2026-09-20 America/Chicago. Staleness window 24 h, after checking task liveness.
+Owner: released after software review and publication checkpoint. Staleness window 24 h, after checking task liveness.
 
 ## Current result
 Hardware-ready dashboard. Review outputs/REPORT.md and outputs/candidate-manifest.json.
 Source/configuration candidate SHA256:
 `8d6349c231c8ac62431c035b6507c3c2bd55c676258b945addb94280638515f2`.
-Hashes normalize CRLF to LF; see manifest for digest method. Initial commit/push
-to origin/main is being prepared under H003. Python 3.12.14 / Dash 3.4.0 /
+Hashes normalize CRLF to LF; see manifest for digest method. Implementation commit
+`c1794ea92c06845903356b5d003da24961913a8e` pushed to origin/main under H003 (E007).
+This checkpoint is a following documentation commit. Python 3.12.14 / Dash 3.4.0 /
 hidapi 0.15.0; packages in uv.lock.
 Defaults: USB2ANY 2047:0301, I2C 0x44, 100 kHz, on-demand LPM0, 1 s, heater off.
 
@@ -48,11 +49,11 @@ discovery/identity. Preserve reports and reconcile actual hardware assumptions.
 Control validation follows reliable V1 acquisition; heater testing needs explicit scope.
 
 ## Loop continuity
-No hardware authorization recorded. H003 authorizes software review and Git publication.
-Publication intent: inspect final staged diff, create the initial main commit, and
-push main to git@github.com:cct1123/ti-hdc-sensor-monitor.git without force. Verify
-local HEAD matches the remote main ref; reconcile Git status/refs before any retry.
-No physical operation is in flight.
+No hardware authorization recorded. H003 software review and candidate publication
+completed (E006/E007). Git destination: git@github.com:cct1123/ti-hdc-sensor-monitor.git,
+branch main tracking origin/main. This documentation checkpoint is also to be committed
+and pushed; completion is observable by matching local HEAD with remote refs/heads/main.
+No physical operation is in flight. Reconcile Git refs before any publication retry.
 Current gap: physical validation; zero physical attempts. Preview may be running
 at http://127.0.0.1:8050 with simulation selected, heater off and recording stopped.
 Test/browser recordings in recordings/ are ignored scratch data. Reproducible
