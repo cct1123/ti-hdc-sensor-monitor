@@ -191,3 +191,13 @@ README match published HEAD. Candidate:
 PASS (22 files); `git diff --check` PASS. Existing 36-test and simulation results
 remain applicable because runtime code/configuration/tests did not change.
 Publication target: origin/main, normal push only; no physical access authorized.
+
+## E011 - Documentation published (2026-09-21)
+Reviewed the staged diff and committed all intended documentation/assets as
+`586f9c5680bd9b1ce145198eed5fac4f7522830c` (13 files). Normal push to origin/main
+succeeded. At 16:08 America/Chicago, HEAD, origin/main and `git ls-remote origin
+refs/heads/main` all matched that commit; the worktree was clean.
+This following checkpoint records the verified result and releases state ownership.
+Publish it under H006 with a normal push; verify its own revision through Git refs.
+Candidate digest remains `511516293b1c4a4faf00c66b5c31351634c0c3d64b1273422b0b926211c36007`.
+Hardware review remains pending; no physical interaction occurred.

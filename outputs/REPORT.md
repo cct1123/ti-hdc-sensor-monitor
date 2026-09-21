@@ -8,7 +8,7 @@ File hashes normalize CRLF to LF so Windows and Git checkouts verify identically
 the exact digest method is recorded in the manifest. Git publication is tracked in STATE.md.
 Implementation commit: `c1794ea92c06845903356b5d003da24961913a8e`, published on `main` (E007).
 The subsequent H004/H005 README/guide/screenshots and supplied device-photo updates
-leave runtime code unchanged; H006 authorizes their reviewed publication (E010).
+leave runtime code unchanged and were published as `586f9c5` under H006 (E010/E011).
 
 ## Delivered
 

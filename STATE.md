@@ -1,9 +1,9 @@
 # Current checkpoint
 
 Phase: **AWAITING_HUMAN_REVIEW**
-Checkpoint: 2026-09-21 16:08 America/Chicago (21:08 UTC), documentation ready to publish (E010)
+Checkpoint: 2026-09-21 16:08 America/Chicago (21:08 UTC), documentation publication verified (E011)
 Last applied human input: H006
-Owner: current Codex session, reviewing and publishing documentation. Staleness window 24 h, after checking task liveness.
+Owner: released after documentation publication. Staleness window 24 h, after checking task liveness.
 
 ## Current result
 Hardware-ready dashboard. Review outputs/REPORT.md and outputs/candidate-manifest.json.
@@ -11,8 +11,9 @@ Source/configuration candidate SHA256:
 `511516293b1c4a4faf00c66b5c31351634c0c3d64b1273422b0b926211c36007`.
 Hashes normalize CRLF to LF; see manifest for digest method. Implementation commit
 `c1794ea92c06845903356b5d003da24961913a8e` pushed to origin/main under H003 (E007).
-Published checkpoint: 2ac3139. H004/H005 documentation changes are local, uncommitted;
-runtime code is unchanged. Python 3.12.14 / Dash 3.4.0 /
+Documentation commit `586f9c5680bd9b1ce145198eed5fac4f7522830c` published to origin/main
+under H006 (E011). This following checkpoint records publication; runtime code is
+unchanged. Python 3.12.14 / Dash 3.4.0 /
 hidapi 0.15.0; packages in uv.lock.
 Defaults: USB2ANY 2047:0301, I2C 0x44, 100 kHz, on-demand LPM0, 1 s, heater off.
 
@@ -53,15 +54,13 @@ discovery/identity. Preserve reports and reconcile actual hardware assumptions.
 Control validation follows reliable V1 acquisition; heater testing needs explicit scope.
 
 ## Loop continuity
-No hardware authorization recorded. H003 publication completed (E006/E007);
-local main and origin/main both 2ac3139. H004/H005 README/guide/images and evidence are
-local changes; H006 authorizes pruning, committing and pushing them to origin/main.
-In flight: commit reviewed documentation/evidence with subject "Document dashboard usage
-with screenshots and device photo", then `git push origin main`. Pre-operation HEAD:
-2ac313965e2a5808e23edd3994f04d68ff05285c. Expected result: new local and remote main
-contain the reviewed 34-file candidate and five images. Verify commit contents and
-compare HEAD, origin/main and `git ls-remote origin refs/heads/main`; inspect before any
-retry, never force-push. A following checkpoint commit may record the observed result.
+No hardware authorization recorded. H003 and H006 publication completed (E007/E011).
+The documentation push was verified against remote main at 586f9c5; its in-flight
+operation is resolved. Git destination: git@github.com:cct1123/ti-hdc-sensor-monitor.git,
+branch main tracking origin/main. Publish this following evidence checkpoint under H006
+with a normal push; completion is observable by matching HEAD, origin/main and
+`git ls-remote origin refs/heads/main`. Inspect refs before any retry; never force-push.
+No physical operation is in flight.
 Documentation demonstration finished and its isolated simulator/Markdown servers on
 8051/8052 were stopped after clean disconnect (E008). No other server was changed.
 Current gap: physical validation; zero physical attempts.
