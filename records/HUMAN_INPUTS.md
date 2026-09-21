@@ -28,3 +28,21 @@ then commit and push. Preserve intentional work and report changes, validation,
 commit hash and pushed branch. This authorizes software review and Git publication
 while the candidate awaits hardware review; it does not authorize device access.
 Applied to STATE.md. Hardware approval remains pending.
+
+## H004 - Illustrated README and usage demonstration (2026-09-21, user in this task)
+User requested improving README, showing how to use the dashboard, and including
+screenshots demonstrating functions, with the TMP monitor README as the reference:
+https://github.com/cct1123/ti-tmp-sensor-monitor/blob/main/README.md.
+Scope: documentation and authentic screenshots from this application's simulator.
+No physical-device authorization; retain the candidate hardware review gate.
+
+## H005 - Add supplied device photograph (2026-09-21, user in this task)
+User requested placing the attached device picture in README. Source attachment:
+codex-clipboard-b5a2e497-62b7-4a6f-9efd-e9220e3fbbe0.png.
+Scope: preserve the supplied picture as a repository asset and embed it in README.
+No change to runtime behavior or hardware authorization.
+
+## H006 - Prune, commit and push documentation (2026-09-21, user in this task)
+User requested "prune commit push" for the pending README, guide, images and records.
+Review and remove unnecessary material, validate, then publish to the existing
+main branch on origin. Preserve intentional work and the physical review gate.

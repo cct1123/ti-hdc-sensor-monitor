@@ -1,5 +1,5 @@
 {
-  "candidate_sha256": "8d6349c231c8ac62431c035b6507c3c2bd55c676258b945addb94280638515f2",
+  "candidate_sha256": "511516293b1c4a4faf00c66b5c31351634c0c3d64b1273422b0b926211c36007",
   "python": "3.12.14",
   "packages": {
     "dash": "3.4.0",
@@ -15,6 +15,7 @@
     "assets/styles.css": "a89ea38c678931a3bb95b070a63f85c9c80f4ca386c512a16d0fb47cc56c3921",
     "docs/hardware-validation.md": "7104b0989e7ec9bf9fd4e5ddd06cff03895d9ee64a2cd92c4a6e0e7e018c26be",
     "docs/protocol.md": "0fc1ee494aaec5e06a27b81cff6b4a5d6ab497a80df4848bb539e7da51b0eba8",
+    "docs/usage-guide.md": "d051e9427e7bddfc27eac13d92eea80df3013cde2b4db731d6e820ba3b402af2",
     "hdcsensor/__init__.py": "746f72d7f8fa9c6d88d38063800757a083c28fb97f4791d32af5f82ccb9233e2",
     "hdcsensor/acquisition.py": "7053f6b983b20a59eda430f0c3e9454b82291f9daa75768dbc120d6043bfc39b",
     "hdcsensor/device_session.py": "72ae1837b4fb83d99f61a00bd469448440f6451a4a3c873e4695f2637ce748a8",
@@ -32,7 +33,7 @@
     "NOTICE.md": "b1d93daf42de3bee32e5912e745d1aedc92aedf5821131517d86bd6964e26450",
     "PROJECT.md": "8ffca303025eb3c522b42965dc80c0d21f63c9334d238e72db2373f7d616d394",
     "pyproject.toml": "5f2045b67b6a4661bdd259c5604601442b93b1a6dfa73ad181fafb6a33ce5c78",
-    "README.md": "c477207b34d8ca8b1f4007a3a2bd8699c8880bedd00b1f65efc865fe488d2fda",
+    "README.md": "f6829ff996e0ee1a742867504450b64fcfc6135c39d49e321d3239a1f3b2c0e0",
     "tests/test_dashboard.py": "0bc9992ed6868f57a29cfc6bdcb5346c955ad09eab42110cf74cc7ed20ffd0b5",
     "tests/test_protocol.py": "14f711cfdb4b56f05ec7edf744f5ef5777a092910298a692108db6be37a218c2",
     "tests/test_recording.py": "b1a3128aea86f819f9d81ca3db36df730ff731bed070657cc02fb03e3ef57094",

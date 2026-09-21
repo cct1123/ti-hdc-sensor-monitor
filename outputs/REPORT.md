@@ -3,10 +3,12 @@
 **Phase: AWAITING_HUMAN_REVIEW.** Software and simulated integration pass;
 the physical HDC3020EVM has not been enumerated, opened or measured.
 Candidate source/configuration hashes: [candidate-manifest.json](candidate-manifest.json).
-Candidate SHA256: `8d6349c231c8ac62431c035b6507c3c2bd55c676258b945addb94280638515f2`.
+Candidate SHA256: `511516293b1c4a4faf00c66b5c31351634c0c3d64b1273422b0b926211c36007`.
 File hashes normalize CRLF to LF so Windows and Git checkouts verify identically;
 the exact digest method is recorded in the manifest. Git publication is tracked in STATE.md.
 Implementation commit: `c1794ea92c06845903356b5d003da24961913a8e`, published on `main` (E007).
+The subsequent H004/H005 README/guide/screenshots and supplied device-photo updates
+leave runtime code unchanged; H006 authorizes their reviewed publication (E010).
 
 ## Delivered
 
@@ -34,6 +36,7 @@ Implementation commit: `c1794ea92c06845903356b5d003da24961913a8e`, published on 
 | Browser monitoring/settings/zoom/follow/recording/heater timer | PASS, simulation only | E004 |
 | TEST-005: physical USB acquisition/CSV/reopen | UNTESTED | Candidate approval required |
 | TEST-006: physical controls and heater | UNTESTED | After V1; heater needs specific scope |
+| TEST-007: illustrated usage documentation | PASS | [link/image/capture checks](documentation-checks.json), E008–E010 |
 
 Final software review (E006) removed unused TMP-specific CSS and discarded per-channel
 plot layout setup. The final plotted values/axes are unchanged. Browser checks found

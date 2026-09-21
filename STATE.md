@@ -1,17 +1,18 @@
 # Current checkpoint
 
 Phase: **AWAITING_HUMAN_REVIEW**
-Checkpoint: 2026-09-20 22:29 America/Chicago (2026-09-21 03:29 UTC), E007
-Last applied human input: H003
-Owner: released after software review and publication checkpoint. Staleness window 24 h, after checking task liveness.
+Checkpoint: 2026-09-21 16:08 America/Chicago (21:08 UTC), documentation ready to publish (E010)
+Last applied human input: H006
+Owner: current Codex session, reviewing and publishing documentation. Staleness window 24 h, after checking task liveness.
 
 ## Current result
 Hardware-ready dashboard. Review outputs/REPORT.md and outputs/candidate-manifest.json.
 Source/configuration candidate SHA256:
-`8d6349c231c8ac62431c035b6507c3c2bd55c676258b945addb94280638515f2`.
+`511516293b1c4a4faf00c66b5c31351634c0c3d64b1273422b0b926211c36007`.
 Hashes normalize CRLF to LF; see manifest for digest method. Implementation commit
 `c1794ea92c06845903356b5d003da24961913a8e` pushed to origin/main under H003 (E007).
-This checkpoint is a following documentation commit. Python 3.12.14 / Dash 3.4.0 /
+Published checkpoint: 2ac3139. H004/H005 documentation changes are local, uncommitted;
+runtime code is unchanged. Python 3.12.14 / Dash 3.4.0 /
 hidapi 0.15.0; packages in uv.lock.
 Defaults: USB2ANY 2047:0301, I2C 0x44, 100 kHz, on-demand LPM0, 1 s, heater off.
 
@@ -30,7 +31,10 @@ interval 0.999076 s, no read failures/lost rows, successful close/reopen (E003).
 No physical HID enumeration/open performed.
 E005 reconciled the original candidate. E006 pruned unused CSS/plot setup and
 verified unchanged output; the updated manifest supersedes the original digest.
-Saved simulation evidence remains applicable. H003 preserves the hardware gate.
+Saved simulation evidence remains applicable. E008–E010/TEST-007 verifies the illustrated
+README/guide, 29 relative links/anchors, four simulator screenshots and the supplied device photo.
+E010 pruned duplicated README detail; lint/format checks pass. The documentation candidate
+includes 34 text files; H004–H006 preserve the hardware gate.
 
 ## Architecture
 Dash callbacks -> AcquisitionService -> queued DeviceSession worker -> HDC3020Sensor
@@ -42,20 +46,25 @@ Approve the candidate in outputs/REPORT.md for initial USB validation: identity,
 thirty approximately one-second paired samples, CSV checks and clean close/reopen.
 Connect one stock HDC3020EVM and close TI's GUI. Keep heater off; no EEPROM/firmware
 changes. Identify a USB serial if several boards are attached. Record approval as
-H004 (or the next unused H ID) with candidate and scope before acting.
+H007 (or the next unused H ID) with candidate and scope before acting.
 
 Next: follow docs/hardware-validation.md TEST-005, starting with filtered HID
 discovery/identity. Preserve reports and reconcile actual hardware assumptions.
 Control validation follows reliable V1 acquisition; heater testing needs explicit scope.
 
 ## Loop continuity
-No hardware authorization recorded. H003 software review and candidate publication
-completed (E006/E007). Git destination: git@github.com:cct1123/ti-hdc-sensor-monitor.git,
-branch main tracking origin/main. This documentation checkpoint is also to be committed
-and pushed; completion is observable by matching local HEAD with remote refs/heads/main.
-No physical operation is in flight. Reconcile Git refs before any publication retry.
-Current gap: physical validation; zero physical attempts. Preview may be running
-at http://127.0.0.1:8050 with simulation selected, heater off and recording stopped.
+No hardware authorization recorded. H003 publication completed (E006/E007);
+local main and origin/main both 2ac3139. H004/H005 README/guide/images and evidence are
+local changes; H006 authorizes pruning, committing and pushing them to origin/main.
+In flight: commit reviewed documentation/evidence with subject "Document dashboard usage
+with screenshots and device photo", then `git push origin main`. Pre-operation HEAD:
+2ac313965e2a5808e23edd3994f04d68ff05285c. Expected result: new local and remote main
+contain the reviewed 34-file candidate and five images. Verify commit contents and
+compare HEAD, origin/main and `git ls-remote origin refs/heads/main`; inspect before any
+retry, never force-push. A following checkpoint commit may record the observed result.
+Documentation demonstration finished and its isolated simulator/Markdown servers on
+8051/8052 were stopped after clean disconnect (E008). No other server was changed.
+Current gap: physical validation; zero physical attempts.
 Test/browser recordings in recordings/ are ignored scratch data. Reproducible
 simulation evidence is under outputs/simulation-validation/.
 

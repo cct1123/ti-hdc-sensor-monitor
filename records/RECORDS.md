@@ -126,3 +126,68 @@ configuration candidate remains `8d6349c231c8ac62431c035b6507c3c2bd55c676258b945
 For publication recovery, compare local HEAD, origin/main and the remote main ref;
 all must agree after the documentation commit is pushed. Physical validation remains
 UNTESTED and requires the candidate-specific approval in STATE.md.
+
+## E008 - Illustrated documentation and simulator walkthrough (2026-09-21)
+H004: reviewed the referenced TMP README in the browser at revision
+b8e1e4e7116943c826d3b59626059cd2b6d15923, matching the local reference checkout.
+Reconciled the clean main/origin-main checkpoint at 2ac3139 and all 33 prior
+candidate hashes before editing. Expanded README with simulator/USB quick starts,
+record/download/export steps and screenshots; added docs/usage-guide.md for the
+illustrated history/settings/CSV walkthrough and troubleshooting. Corrected the
+documented Ruff invocation to include its dev extra. No runtime code changed.
+
+TEST-007 PASS: outputs/documentation-checks.json records 29 valid relative links/
+anchors, four verified JPEG images (413,707 bytes total), dimensions and SHA256s.
+Screenshots are native browser captures of an isolated `app.py --simulate --port
+8051` process: monitor-overview.jpg, history-held.jpg, csv-saved.jpg and
+device-settings.jpg under docs/images/. No image synthesis or sensor-data editing.
+All screenshots/captions explicitly identify simulation; no physical access occurred.
+
+Observed monitoring and paired plots; Zoom in held both time axes, Follow live
+restored following; Record/Stop recording saved 414 paired rows with zero drops
+and enabled Download last CSV. Inspected that CSV: all rows simulated, on-demand
+LPM0, heater off. Applied auto_1hz/LPM1 for the settings capture and confirmed the
+Applied line. Simulator ended cleanly disconnected with 596 buffered pairs and
+zero failed reads. No heater pulse was requested. CSV remains ignored scratch data.
+
+Rendered README and guide locally through Dash Markdown: every screenshot loaded,
+tables/steps rendered, and README had no horizontal overflow. Inspected the four
+captures visually. Temporary preview tabs and the two session-created servers
+(ports 8051/8052) were closed after disconnect; the user's reference tab was preserved.
+`git diff --check` PASS. No unit rerun was needed for text/images: 32 previously
+manifested files other than README remained identical, including all runtime code
+and tests; E003/E006 evidence remains applicable.
+
+Updated the manifest for README and the new text guide (34 files). Screenshot hashes
+are in documentation-checks.json. Current candidate:
+`999e943a3e7aba0db59543bfa003e268257e4ac5bd53f2f4f4ee493d0cc08760`.
+H004 documentation changes remain local; no new commit or push performed.
+
+## E009 - Supplied device photo in README (2026-09-21)
+H005: copied the supplied PNG unchanged to docs/images/hdc3020evm.png and embedded
+it below README's introduction with descriptive alt text and a device caption.
+TEST-007 PASS: verified the 640 x 360 PNG, byte equality with the attachment, and
+all 30 local README/guide links and anchors. Visually inspected the copied image.
+Final `git diff --check` passed.
+outputs/documentation-checks.json includes the photo's size and SHA256.
+All 33 other candidate text files remain unchanged; no runtime tests were needed.
+Updated README's manifest hash and candidate digest:
+`77b87f755903242c74b0a347b5f6ea38ef05497d56855a5f87c5129a5ce557f9`.
+No physical interaction or publication performed; prior simulator evidence applies.
+
+## E010 - Documentation pruning and publication review (2026-09-21)
+H006: retained all five referenced images and the illustrated guide. Removed
+repeated CSV/control details from README; the guide retains the full instructions.
+Corrected wording that could imply the hardware procedure was already approved.
+Removed the five ignored, session-created preview helper/log files under tmp/readme;
+their servers were already stopped. Preserved runtime code and historical evidence.
+
+TEST-007 PASS: rechecked 29 local links/anchors, balanced code fences, five image
+formats/dimensions/hashes and no unused image assets. Refreshed documentation-checks.json
+and the 34-file candidate manifest; all 32 pre-existing candidate files other than
+README match published HEAD. Candidate:
+`511516293b1c4a4faf00c66b5c31351634c0c3d64b1273422b0b926211c36007`.
+`ruff check app.py hdcsensor tests` PASS; `ruff format --check app.py hdcsensor tests`
+PASS (22 files); `git diff --check` PASS. Existing 36-test and simulation results
+remain applicable because runtime code/configuration/tests did not change.
+Publication target: origin/main, normal push only; no physical access authorized.

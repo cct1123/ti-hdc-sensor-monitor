@@ -1,85 +1,115 @@
 # TI HDC Sensor Monitor
 
-Local Python dashboard for the **TI HDC3020EVM**: paired temperature and relative
-humidity, live synchronized plots, statistics, CSV logging and basic sensor controls.
+Watch temperature and relative humidity together, explore synchronized history, and
+save paired measurements to CSV. The dashboard runs locally in your browser, with
+Python handling the **TI HDC3020EVM** through USB / USB2ANY HID.
+
+![TI HDC3020EVM USB evaluation board](docs/images/hdc3020evm.png)
+
+*TI HDC3020EVM temperature and humidity evaluation board.*
+
 Modeled on [ti-tmp-sensor-monitor](https://github.com/cct1123/ti-tmp-sensor-monitor)
 using the same Dash interface conventions and single-session architecture.
+
+![HDC dashboard showing paired readings, statistics, synchronized history and active CSV recording in simulation](docs/images/monitor-overview.jpg)
+
+*Paired readings every second, independent channel statistics, synchronized plots,
+and CSV recording. All screenshots use this application's simulator; they do not
+demonstrate physical HDC3020EVM validation.*
 
 **Status:** software-tested candidate; physical HDC3020EVM validation is pending.
 See [the candidate report](outputs/REPORT.md) and [current checkpoint](STATE.md).
 
 ## Quick start
 
-Install [uv](https://docs.astral.sh/uv/), then in this directory:
+Install [uv](https://docs.astral.sh/uv/), then open a terminal in this repository.
+
+### Try it without a board
+
+```powershell
+uv run python app.py --simulate
+```
+
+Open [the dashboard](http://127.0.0.1:8050/), leave **Simulation · no hardware** selected,
+and click **Start monitoring**. Both readings and plots update automatically. Click
+**Record** to save new samples. Simulation is labeled in the dashboard and every CSV row;
+it does not import, enumerate or open HID devices. Choosing USB later is an explicit
+physical connection.
+
+### Use an HDC3020EVM
 
 ```powershell
 uv sync --extra usb
 uv run --extra usb python app.py
 ```
 
-Open **http://127.0.0.1:8050**. Close TI's EVM GUI, connect one stock HDC3020EVM,
-leave USB / USB2ANY HID and address `0x44` selected, and click **Start monitoring**.
-The terminal must remain running. Hardware integration by an engineering agent
-follows the candidate approval gate in AGENTS.md.
+1. Close TI's EVM GUI and connect one stock HDC3020EVM by USB.
+2. Open [the dashboard](http://127.0.0.1:8050/). Select **USB / USB2ANY HID**, address
+   **0x44**, and a **1 s** sample interval. Enter a USB serial if several boards are attached.
+3. Click **Start monitoring**. Check the source, timestamp and **Failed reads** counter.
+4. Click **Record** to save new samples.
 
-For a preview without a board:
-
-```powershell
-uv run python app.py --simulate
-```
-
-Then click **Start monitoring**. Simulation is explicitly labeled in the dashboard
-and every CSV row. It does not import, enumerate or open HID devices.
-The switch preselects simulation; choosing USB later is an explicit physical connection.
-
-Alternative installation, using Python 3.9 or newer:
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python -m pip install "dash>=2.18,<4" "hidapi>=0.15,<1"
-.\.venv\Scripts\python app.py
-```
+Keep the terminal running. Hardware integration by an engineering agent follows
+the candidate approval gate in [AGENTS.md](AGENTS.md). For installation without uv,
+see the [usage guide](docs/usage-guide.md#installation-without-uv).
 
 The USB backend supports 64-bit Python through hidapi; it does not require
 `USB2ANY.dll`, TI Cloud Agent, or TI's GUI. Installation downloads dependencies;
 monitoring serves assets locally and binds only to loopback. Run one app process
 per board. All browser tabs share that process's device session and recorder.
 
-## Monitor and record
+## Monitor and browse history
 
 - **Connect** opens and identifies the device without sampling. It establishes
   on-demand LPM0 with the heater off; these are volatile changes.
 - **Start monitoring** connects automatically or resumes. The default is a fresh
   paired conversion each second. **Stop** pauses host acquisition; **Disconnect**
-  turns the heater off, exits auto mode and releases the board.
+  attempts heater-off and exit-auto, then releases the board.
 - Live values show the last sample timestamp. Disconnected/paused readings are
   explicitly marked as retained. Statistics cover the entire 7,200-sample buffer.
 - The two plots share their time range. Drag or zoom either plot; **Follow live**
   returns to the last five minutes. **Clear data** clears only the in-memory buffer.
-- **Record** saves new samples into `recordings/`. Earlier samples are available
-  through **Export buffer**. Logging can remain enabled across sampling pauses.
-- **Stop recording** drains accepted rows. **Download last CSV** becomes available
-  after the writer finishes. Dropped rows and disk errors remain visible.
 
-CSV columns: `timestamp_utc`, `sequence`, `temperature_c`, `relative_humidity_pct`,
-`source`, `raw_temperature`, `raw_humidity`, `mode`, `low_power`, `heater_on`.
-Plots use the computer's local time; CSV uses UTC. Heater-on readings remain in
-statistics and are marked with orange plot markers and `heater_on=1`.
+See the [history walkthrough](docs/usage-guide.md#2-browse-history-and-return-to-live)
+for a screenshot of a held range and how to return to live following.
+
+## Record, download, and export
+
+1. Click **Record** to log new samples under `recordings/`.
+2. Watch the filename, written-row count and dropped-row count in **CSV recording**.
+3. Click **Stop recording** and wait for the writer to finish.
+4. Click **Download last CSV** to download that file, or **Export buffer** to save
+   all samples currently held in memory without changing the recording state.
+
+![Saved simulator CSV recording with row count, zero dropped rows, and enabled download and export controls](docs/images/csv-saved.jpg)
+
+*414 simulated pairs saved with zero dropped rows. After Stop recording, the status
+changes to Saved and Download last CSV becomes available.*
+
+Recording starts with new samples; it does not include earlier history. **Stop** pauses
+acquisition but leaves recording armed for a later resume. **Clear data** does not erase
+the file. Disk errors and dropped rows remain visible.
+
+CSV pairs both channels with UTC timestamps, raw values, source and measurement settings.
+Plots use the computer's local time. Heater-on readings are marked in plots and CSV.
+See [CSV columns and behavior](docs/usage-guide.md#3-record-and-export-csv) for details.
 
 ## Device settings
 
 Both pages remain mounted: changing tabs preserves plots, data, recording and draft controls.
+Choose a measurement mode and low-power mode, then click **Apply measurement settings**.
 The **Applied** line describes the active configuration; dropdowns are editable drafts.
 
-- Measurement mode: on-demand, auto 1 Hz, or auto 0.5 Hz. The latter is read at
-  intervals of at least 2.02 seconds to avoid fetching an empty latch.
-- LPM0 through LPM3 select the noise/power tradeoff. Settings apply on the device worker.
+![Device settings after applying automatic 1 Hz and LPM1, with simulated identity, status, reset and heater controls](docs/images/device-settings.jpg)
+
+*Simulator example after applying auto 1 Hz and LPM1. The NIST serial is a simulator
+fixture, not a physical board's identity. The heater remains off.*
+
+- Measurement mode: on-demand, auto 1 Hz, or auto 0.5 Hz.
+- LPM0 through LPM3 select the noise/power tradeoff.
 - **Take one sample** works while paused in on-demand mode.
-- Status read/clear, manufacturer ID (`0x3000` for TI), 48-bit NIST serial, and soft reset.
-  HDC3020 has no separate model-ID command in the documented command table; the UI does
-  not relabel the manufacturer word as an HDC-specific part ID.
-- A confirmed **5 s low-level heater pulse** uses the minimum element (`0x0001`);
-  **Heater off** disables it immediately when the worker handles the command.
+- Status read/clear, TI manufacturer ID, 48-bit NIST serial, and soft reset.
+- A confirmed **5 s low-level heater pulse** and an explicit **Heater off** control.
   Heat changes both measurements, including during cooldown. The host timer is
   best-effort, not a firmware watchdog. If communication fails, unplug the EVM.
 - Soft reset restores this app's on-demand LPM0 configuration with heater off.
@@ -87,36 +117,30 @@ The **Applied** line describes the active configuration; dropdowns are editable 
 
 In auto mode, **Stop** pauses reads while the device continues autonomous conversions.
 Choose on-demand mode or Disconnect to stop autonomous conversion.
+See the [settings walkthrough](docs/usage-guide.md#4-apply-settings-and-check-the-result)
+for draft/application behavior and the relationship between mode and sample interval.
 
 ## Errors and troubleshooting
 
-Missing/multiple boards, permissions, I2C NAKs, malformed HID replies, transport CRC,
-sensor CRC and short replies produce explicit errors. Specify the USB serial if
-several compatible EVMs are attached. Close other software that owns the board.
-
-Bad measurements are discarded as a pair. A transient failure can recover on the
-next scheduled read; three consecutive failures close the session. A failed control
-operation disconnects immediately because a timed-out write may have taken effect.
-Reconnect explicitly to re-establish known state. Cleanup failures are reported;
-do not assume a failed heater-off command succeeded.
-
-No board found despite a working TI GUI may indicate a different VID/PID or firmware.
-Capture its identity and compare with [the protocol assumptions](docs/protocol.md)
-before changing transport behavior. Do not flash firmware as a troubleshooting shortcut.
+The [troubleshooting table](docs/usage-guide.md#troubleshooting) covers missing/busy
+boards, failed reads, recording problems and held plots. Bad pairs are discarded;
+three consecutive failures close the session. Failed control operations disconnect
+immediately because a timed-out write may have taken effect. Resolve the error and
+reconnect explicitly. Cleanup failures remain visible; never assume a failed
+heater-off command succeeded.
 
 ## Verification
 
 ```powershell
-uv sync --extra usb --extra dev
 uv run python -m unittest discover -s tests -v
-uv run ruff check app.py hdcsensor tests
+uv run --extra dev ruff check app.py hdcsensor tests
 uv run python -m hdcsensor.validate --samples 30
 ```
 
 The last command runs a bounded **simulation** acquisition/CSV/reopen check and writes
 a JSON report. Tests use fakes, including HID framing and error injection; none discover hardware.
 
-After candidate approval, close or Disconnect the dashboard and run:
+After candidate approval, **Disconnect** the dashboard (Stop alone keeps it open), then run:
 
 ```powershell
 uv run --extra usb python -m hdcsensor.validate --hardware --samples 30 --interval 1
@@ -127,9 +151,14 @@ initializes measurement mode/heater-off, logs samples, closes and reopens the bo
 It does not enable the heater. See [physical validation](docs/hardware-validation.md)
 for the exact sequence, manual control checks and cleanup.
 
-## Project continuity
+## Documentation and references
+
+- [Illustrated usage guide](docs/usage-guide.md): first run, history, CSV, settings and recovery.
+- [Architecture](ARCHITECTURE.md): device ownership and background workers.
+- [Protocol](docs/protocol.md): HID framing, raw I²C, commands, CRC and conversion.
+- [HDC3020EVM](https://www.ti.com/tool/HDC3020EVM), [EVM user guide](https://www.ti.com/lit/pdf/snau267),
+  and [HDC3020 datasheet](https://www.ti.com/lit/gpn/hdc3020).
 
 Read [PROJECT.md](PROJECT.md) for intent, [STATE.md](STATE.md) for current evidence
 and next action, and [AGENTS.md](AGENTS.md) for the engineering loop/review gate.
-[Architecture](ARCHITECTURE.md) explains ownership; [NOTICE.md](NOTICE.md) records reuse.
-Licensed under [MIT](LICENSE).
+Licensed under [MIT](LICENSE). Adaptation credits are in [NOTICE.md](NOTICE.md).

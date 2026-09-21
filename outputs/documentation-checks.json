@@ -1,0 +1,69 @@
+{
+  "checked_utc": "2026-09-21T20:22:05.496651+00:00",
+  "test": "TEST-007",
+  "passed": true,
+  "physical_validation": false,
+  "relative_links_and_anchors_checked": 29,
+  "images": [
+    {
+      "path": "docs/images/csv-saved.jpg",
+      "width": 1265,
+      "height": 712,
+      "bytes": 66636,
+      "sha256": "ce15ee093e0d036107b69f09c368bc26bd0e812561fb06a57b64a37f0d974a1f"
+    },
+    {
+      "path": "docs/images/device-settings.jpg",
+      "width": 1265,
+      "height": 934,
+      "bytes": 94984,
+      "sha256": "748a205e010e69da5e2de203f12ed2975dbf9b276277245f8e10e3cbdca8bf88"
+    },
+    {
+      "path": "docs/images/history-held.jpg",
+      "width": 1265,
+      "height": 1366,
+      "bytes": 123337,
+      "sha256": "7b8b0f7267fd1cdf01fd769f2a13a0e5a3907b7574a2fd15764ff6a3aa1e3ab6"
+    },
+    {
+      "path": "docs/images/monitor-overview.jpg",
+      "width": 1265,
+      "height": 1366,
+      "bytes": 128750,
+      "sha256": "be2c771ccbad4794102f47278f18e6852e307ae945b7ad73187a63bd63f39318"
+    },
+    {
+      "path": "docs/images/hdc3020evm.png",
+      "kind": "user-supplied device photograph; unchanged attachment",
+      "width": 640,
+      "height": 360,
+      "bytes": 175635,
+      "sha256": "9a0ff4de6118423bed40c622ea46ee0766065a05265ca60b28a46bc5b556ae19"
+    }
+  ],
+  "unchanged_previous_candidate_files": 32,
+  "screenshot_recording": {
+    "file": "hdc3020_20260921_200918_916630.csv",
+    "rows": 414,
+    "source": "SIMULATED HDC3020 (no hardware)",
+    "heater_on": false,
+    "dropped_rows_ui": 0
+  },
+  "browser_checks": [
+    "README and guide rendered; all screenshot assets loaded",
+    "History view held after zoom; Follow live restored",
+    "Record -> Stop recording -> Saved and download enabled",
+    "Applied auto_1hz/LPM1, heater off",
+    "Clean simulator disconnect: 596 buffered pairs, zero failed reads"
+  ],
+  "device_photo_checked_utc": "2026-09-21T21:03:53.810327+00:00",
+  "publication_review": {
+    "checked_utc": "2026-09-21T21:07:02.108511+00:00",
+    "relative_links_and_anchors": 29,
+    "referenced_images": 5,
+    "orphaned_images": 0,
+    "unchanged_published_candidate_files": 32,
+    "runtime_code_changed": false
+  }
+}
