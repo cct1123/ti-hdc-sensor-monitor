@@ -131,7 +131,10 @@ class USB2ANYHIDTransport:
                     continue  # Asynchronous events or replies queued by a previous session.
                 if reply[3] == 3:
                     code = reply[6] - 256
-                    detail = "I2C address was not acknowledged" if code == -44 else f"device error {code}"
+                    detail = {
+                        -44: "I2C address was not acknowledged",
+                        -54: "bridge I2C pullups require 3.3 V EXT power",
+                    }.get(code, f"device error {code}")
                     raise SensorError(f"USB2ANY command 0x{command:02X}: {detail}")
                 if reply[3] != 2 or reply[4] != 0 or reply[6] != 0:
                     raise SensorError("Unexpected USB2ANY reply type, flags, or status")
@@ -142,8 +145,9 @@ class USB2ANYHIDTransport:
     def configure_i2c(self, frequency_hz: int) -> None:
         if frequency_hz not in (100000, 400000):
             raise ValueError("I2C frequency must be 100 or 400 kHz")
-        # TI HDC3020 GUI: seven-bit addresses, pull-ups enabled.
-        self._command(0x01, bytes([0 if frequency_hz == 100000 else 1, 0, 1]))
+        # The stock EVM has on-board 10 kOhm pullups to its USB-powered 3.3 V rail.
+        # Bridge-managed pullups require separate EXT power and fault with -54.
+        self._command(0x01, bytes([0 if frequency_hz == 100000 else 1, 0, 0]))
         self.frequency_hz = frequency_hz
 
     def write(self, data: bytes) -> None:

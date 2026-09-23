@@ -17,41 +17,23 @@ using the same Dash interface conventions and single-session architecture.
 and CSV recording. All screenshots use this application's simulator; they do not
 demonstrate physical HDC3020EVM validation.*
 
-**Status:** software-tested candidate; physical HDC3020EVM validation is pending.
-See [the candidate report](outputs/REPORT.md) and [current checkpoint](STATE.md).
+**Status:** physical acquisition, CSV, dashboard callbacks and non-heater controls
+passed on the HDC3020EVM. The heater pulse remains untested. See the
+[validation report](outputs/REPORT.md) and [current checkpoint](STATE.md).
 
 ## Quick start
 
-Install [uv](https://docs.astral.sh/uv/), then open a terminal in this repository.
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then open
+Bash (Git Bash on Windows) in this repository. With one HDC3020EVM connected
+and TI's GUI closed, run:
 
-### Try it without a board
-
-```powershell
-uv run python app.py --simulate
-```
-
-Open [the dashboard](http://127.0.0.1:8050/), leave **Simulation · no hardware** selected,
-and click **Start monitoring**. Both readings and plots update automatically. Click
-**Record** to save new samples. Simulation is labeled in the dashboard and every CSV row;
-it does not import, enumerate or open HID devices. Choosing USB later is an explicit
-physical connection.
-
-### Use an HDC3020EVM
-
-```powershell
-uv sync --extra usb
+```bash
 uv run --extra usb python app.py
 ```
 
-1. Close TI's EVM GUI and connect one stock HDC3020EVM by USB.
-2. Open [the dashboard](http://127.0.0.1:8050/). Select **USB / USB2ANY HID**, address
-   **0x44**, and a **1 s** sample interval. Enter a USB serial if several boards are attached.
-3. Click **Start monitoring**. Check the source, timestamp and **Failed reads** counter.
-4. Click **Record** to save new samples.
-
-Keep the terminal running. Hardware integration by an engineering agent follows
-the candidate approval gate in [AGENTS.md](AGENTS.md). For installation without uv,
-see the [usage guide](docs/usage-guide.md#installation-without-uv).
+Open [the dashboard](http://127.0.0.1:8050/) and follow the
+[five-step guide](docs/quick-start.md) to monitor, record and disconnect.
+For simulation without hardware, run `uv run python app.py --simulate`.
 
 The USB backend supports 64-bit Python through hidapi; it does not require
 `USB2ANY.dll`, TI Cloud Agent, or TI's GUI. Installation downloads dependencies;
@@ -131,29 +113,22 @@ heater-off command succeeded.
 
 ## Verification
 
-```powershell
+```bash
 uv run python -m unittest discover -s tests -v
 uv run --extra dev ruff check app.py hdcsensor tests
 uv run python -m hdcsensor.validate --samples 30
 ```
 
-The last command runs a bounded **simulation** acquisition/CSV/reopen check and writes
-a JSON report. Tests use fakes, including HID framing and error injection; none discover hardware.
-
-After candidate approval, **Disconnect** the dashboard (Stop alone keeps it open), then run:
-
-```powershell
-uv run --extra usb python -m hdcsensor.validate --hardware --samples 30 --interval 1
-```
-
-Add `--serial <USB-serial>` if needed. This explicitly opens hardware, reads identity,
-initializes measurement mode/heater-off, logs samples, closes and reopens the board.
-It does not enable the heater. See [physical validation](docs/hardware-validation.md)
-for the exact sequence, manual control checks and cleanup.
+The last command checks acquisition/CSV/reconnect in **simulation**. For the
+approved physical test procedure and its results, see
+[hardware validation](docs/hardware-validation.md) and the
+[validation report](outputs/REPORT.md). Heater-on validation remains outside
+the current approval scope.
 
 ## Documentation and references
 
-- [Illustrated usage guide](docs/usage-guide.md): first run, history, CSV, settings and recovery.
+- [Quick start](docs/quick-start.md): five steps from connection to CSV download.
+- [Illustrated usage guide](docs/usage-guide.md): history, CSV, settings and recovery.
 - [Architecture](ARCHITECTURE.md): device ownership and background workers.
 - [Protocol](docs/protocol.md): HID framing, raw I²C, commands, CRC and conversion.
 - [HDC3020EVM](https://www.ti.com/tool/HDC3020EVM), [EVM user guide](https://www.ti.com/lit/pdf/snau267),

@@ -13,12 +13,14 @@
 - [TMP monitor HID implementation](https://github.com/cct1123/ti-tmp-sensor-monitor/blob/b8e1e4e7116943c826d3b59626059cd2b6d15923/tmpsensor/usb_hid.py),
   reused bridge envelope; its TMP hardware evidence does not validate this HDC board.
 
-References inspected 2026-09-20. TI GUI source is reference material, not bundled runtime code.
+References inspected 2026-09-20 and the EVM schematic/USB2ANY error table
+rechecked 2026-09-23 after the first physical result. TI GUI source is reference
+material, not bundled runtime code.
 
 ## USB2ANY
 
-Assumed HID VID/PID `2047:0301`, report ID `3F`, 64-byte reports. These are reused
-from the TMP/OneDemo transport and require confirmation on the actual HDC EVM.
+HID VID/PID `2047:0301`, report ID `3F`, 64-byte reports. The VID/PID and
+USB2ANY/OneDemo product string were confirmed on the connected EVM (E012).
 Reports contain ID, packet length, and an 8-byte header followed by up to 54 payload
 bytes. Packet header: `54 CRC payload_length type flags sequence status command`.
 Bridge CRC uses polynomial `07`, init `00`, over the packet from payload-length
@@ -29,7 +31,7 @@ Sequence numbers wrap 254 -> 1. No firmware update or power-switch command is is
 | Operation | Bridge command | Payload |
 | --- | --- | --- |
 | Firmware version | `0A` | four zero bytes; expect four version bytes |
-| I2C configuration | `01` | `speed, 0, 1` (7-bit, pullups; 0=100 kHz, 1=400 kHz) |
+| I2C configuration | `01` | `speed, 0, 0` (7-bit, bridge pullups off; 0=100 kHz, 1=400 kHz) |
 | Raw I2C write | `02` | `0, address, count, bytes...` |
 | Raw I2C read | `03` | `0, address, count, 0` |
 
@@ -38,6 +40,10 @@ generic USB2ANY wrapper uses three payload bytes. Reads return exactly the reque
 payload count; short responses fail. Sensor commands are two-byte big endian,
 not the TMP sensor's one-byte register address. Separate write/STOP, wait, and
 raw read transactions follow TI's HDC GUI path. No clock stretching is required.
+The stock EVM has four 10 kΩ I2C pullups tied to its USB-powered 3.3 V rail
+(SNAU267A schematic, p. 16). The bridge's own pullups require a distinct 3.3 V
+EXT output; leaving them on caused USB2ANY error -54 on the first physical write
+(E012). This transport disables bridge pullups for the stock EVM.
 
 ## Sensor commands
 

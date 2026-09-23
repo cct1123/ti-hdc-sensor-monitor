@@ -46,3 +46,37 @@ No change to runtime behavior or hardware authorization.
 User requested "prune commit push" for the pending README, guide, images and records.
 Review and remove unnecessary material, validate, then publish to the existing
 main branch on origin. Preserve intentional work and the physical review gate.
+
+## H007 - Approve connected-board validation (2026-09-23, user in this task)
+User reported that the HDC sensor is connected to this computer and explicitly
+approved testing the controller software with the HDC3020EVM to complete validation.
+Applied to the reviewed candidate in outputs/REPORT.md (SHA256
+`511516293b1c4a4faf00c66b5c31351634c0c3d64b1273422b0b926211c36007`):
+authorize TEST-005 identity, 30 approximately one-second paired samples, CSV checks,
+close/reopen, and then non-heater volatile controls in TEST-006 under
+docs/hardware-validation.md. Preserve its no-EEPROM/firmware and heater-off bounds.
+The separate minimum-element heater pulse scope has been requested from the user
+and remains unresolved until an explicit answer is received.
+
+## H008 - Easy software usage guide (2026-09-23, user in this task)
+User requested: "easy step by step guide use the software". Add a short,
+first-use guide for the existing local dashboard and correct stale documentation
+that still says all physical validation is pending. This changes documentation
+only; H007 hardware authority and the separately pending heater scope are
+unchanged. Applied to README.md, docs/quick-start.md, docs/usage-guide.md and
+STATE.md; evidence is E023.
+
+## H009 - Bash and uv documentation preference (2026-09-23, user in this task)
+User requested: "prefer sh, bash. use uv for the management. simplify and prune".
+Update the first-use instructions and related README/illustrated-guide commands
+to Bash with uv; remove redundant setup and the alternative pip/venv path.
+This is a documentation preference, not a change to hardware authority,
+requirements or passing validation. Applied to README.md, docs/quick-start.md,
+docs/usage-guide.md, docs/hardware-validation.md and STATE.md; evidence is E024.
+
+## H010 - Review, clean up, commit and push (2026-09-23, user in this task)
+User requested: "clean up. review commit. push". Review and prune the pending
+hardware-validation changes and evidence, run relevant software checks, then
+commit and push to the existing main branch on origin. Preserve physical test
+evidence and the separately pending heater authorization. This request does not
+authorize another device interaction.

@@ -1,89 +1,97 @@
-# HDC3020EVM monitor: hardware-ready candidate
+# HDC3020EVM monitor: physical validation report
 
-**Phase: AWAITING_HUMAN_REVIEW.** Software and simulated integration pass;
-the physical HDC3020EVM has not been enumerated, opened or measured.
-Candidate source/configuration hashes: [candidate-manifest.json](candidate-manifest.json).
-Candidate SHA256: `511516293b1c4a4faf00c66b5c31351634c0c3d64b1273422b0b926211c36007`.
-File hashes normalize CRLF to LF so Windows and Git checkouts verify identically;
-the exact digest method is recorded in the manifest. Git publication is tracked in STATE.md.
-Implementation commit: `c1794ea92c06845903356b5d003da24961913a8e`, published on `main` (E007).
-The subsequent H004/H005 README/guide/screenshots and supplied device-photo updates
-leave runtime code unchanged and were published as `586f9c5` under H006 (E010/E011).
+**Phase: BLOCKED; resume HARDWARE_VALIDATION after heater-scope input.** Core
+acquisition, recording, dashboard integration, and non-heater controls pass on
+the connected EVM. Heater-on behavior awaits separate explicit scope; sensor
+accuracy has not been calibrated or compared with an independent reference.
+This is not yet a fully validated release.
 
-## Delivered
+## Candidate and configuration
 
-- TMP-style local Dash UI: paired values, min/mean/max, 7,200-sample history,
-  synchronized plots, held zoom/pan and live follow; persistent monitor/settings pages.
-- Direct USB2ANY HID packet/CRC/reply validation, raw I2C, bounded timeouts;
-  HDC3020 commands, conversion delays, per-word sensor CRC and paired conversion.
-- Single queued device worker, bounded queues, explicit errors, cancellation,
-  cleanup and reconnect. Bad measurement pairs are discarded; failed writes invalidate the session.
-- Separate CSV worker with drain-on-stop, loss/error counters, saved CSV download
-  and current-buffer export. UTC timestamps and per-sample mode/LPM/heater metadata.
-- On-demand/auto 1 Hz/auto 0.5 Hz, LPM0–3, status read/clear, manufacturer/NIST ID,
-  soft reset, minimum-element five-second heater pulse with inline acknowledgement, and heater-off.
-- Simulator, tests, bounded validation command, usage/protocol documentation and engineering records.
+The H007 approval applied to the reviewed hardware-ready candidate SHA256
+`511516293b1c4a4faf00c66b5c31351634c0c3d64b1273422b0b926211c36007`
+([candidate manifest](candidate-manifest.json)); its implementation was published
+as `c1794ea92c06845903356b5d003da24961913a8e`, followed by documentation
+commit `586f9c5680bd9b1ce145198eed5fac4f7522830c`. The first physical
+attempt found a bridge-pullup configuration error (E012). D003 corrected that
+volatile setting and the diagnostic message; the corrected version is the one
+tested below. The original manifest remains the review-gate record. Current
+source/configuration hashes are in [validation-manifest.json](validation-manifest.json).
 
-## Evidence
+Actual device: one Texas Instruments USB2ANY/OneDemo HID bridge, VID:PID
+`2047:0301`, USB serial `88F2A26E25000200`, firmware `2.8.2.0`, I2C address
+`0x44`, manufacturer `0x3000`, CRC-checked NIST ID `1A73E0120F3E`.
+Configuration: 100 kHz, 7-bit I2C, bridge-managed pullups off because the
+stock EVM has passive I2C pullups to its USB-powered 3.3 V rail; on-demand
+LPM0, one-second acquisition interval, heater off on normal connect/close.
+Runtime: Windows, Python 3.12.14, Dash 3.4.0, Plotly 7.1.0, hidapi 0.15.0;
+versions are locked in `uv.lock`.
+
+## Delivered system
+
+Dash callbacks → AcquisitionService → one queued DeviceSession worker →
+HDC3020Sensor → USB2ANYHIDTransport. A paired sample buffer and independent
+CSV writer feed live values, min/mean/max, synchronized history plots, recording,
+last-file download and current-buffer export. Controls provide on-demand/auto
+1 Hz/auto 0.5 Hz, LPM0–3, status read/clear, manufacturer/NIST ID, soft reset,
+and a minimum-element timed heater pulse in software. The heater-on path has
+only simulated and unit evidence so far.
+
+## Validation evidence
 
 | Method | Result | Evidence |
 | --- | --- | --- |
-| TEST-001/002: protocol/driver/fake HID | PASS | [reviewed candidate: 36-test transcript](review-unit-tests.txt) |
-| TEST-003: session/CSV concurrency and failure handling | PASS | same transcript |
-| TEST-004: Dash HTTP/plots/simulator integration | PASS | same transcript, E004 |
-| 30-sample simulated acquisition/CSV/close/reopen | PASS | [JSON report](simulation-validation/validation_20260921_030438_901402.json) |
-| Ruff lint/format and Python compile check | PASS | E006; rerun after cleanup |
-| Browser monitoring/settings/zoom/follow/recording/heater timer | PASS, simulation only | E004 |
-| TEST-005: physical USB acquisition/CSV/reopen | UNTESTED | Candidate approval required |
-| TEST-006: physical controls and heater | UNTESTED | After V1; heater needs specific scope |
-| TEST-007: illustrated usage documentation | PASS | [link/image/capture checks](documentation-checks.json), E008–E010 |
+| TEST-001–004: fake-HID/driver/session/recording/Dash software regressions | 36 PASS after pullup fix | [unit transcript](hardware-fix-unit-tests.txt), E013 |
+| Lint and formatting | PASS, 25 Python files | E021 |
+| First physical TEST-005 attempt | FAIL: bridge error -54 before sensor identity | [failure report](hardware-validation/validation_20260923_200536_567859.json), E012 |
+| Physical identity diagnostic after D003 | PASS: manufacturer/NIST/firmware, heater off, clean close | [transcript](hardware-validation/identity-diagnostic.txt), E014 |
+| Physical TEST-005: 30 samples, CSV, close/reopen | PASS: median 1.000613 s (0.978251–1.020820 s); 0 read failures/lost rows | [report](hardware-validation/validation_20260923_200902_021356.json), [CSV](hardware-validation/hardware-validation_20260923_200902_021356.csv), E015 |
+| Physical non-heater TEST-006: modes/LPM/status/reset | PASS: all 12 combinations; auto cadence 1.0172985/2.0151055 s; 0 failures | [report](hardware-validation/controls_20260923_201208_417991.json), E017 |
+| Dash HTTP callback integration with actual EVM | PASS: paired values/plots, 3 CSV rows, export/download, settings, disconnect | [report](hardware-validation/dashboard_20260923_201425_005010.json), [CSV](hardware-validation/hdc3020_20260923_201425_201775.csv), E019 |
+| Browser layout, zoom/follow and controls in simulation | PASS, simulation scope | E004/E008 |
+| Physical heater pulse and cooldown | UNTESTED: specific authorization pending; simulator rehearsal PASS | TEST-006, E020 |
+| Independent accuracy/calibration check | UNTESTED: no reference instrument supplied | Limitation, not an acceptance claim |
 
-Final software review (E006) removed unused TMP-specific CSS and discarded per-channel
-plot layout setup. The final plotted values/axes are unchanged. Browser checks found
-identical computed styles on 36 selected elements and intact monitor/settings pages.
-Device, session and recording behavior is unchanged; E003's simulation remains applicable.
+The physical samples were about 23 °C and 45–47 %RH during this session. Their
+CRC and raw-word conversion checks, continuity and timing support normal sensor
+communication; they do not establish absolute measurement accuracy. One 0.5 Hz
+LPM3 humidity result was lower than the other mode readings; no accuracy or
+noise claim is inferred from these brief tests.
 
-Simulation: 30 pairs, median interval **0.999076 s**, range 0.975828–1.019840 s,
-zero failed reads, no recording loss, matching CSV values/timestamps and successful reopen.
-These are simulator/host results, not physical measurements. The browser session
-on the final layout reached 267 samples without read failures; a 77-row recording
-saved with zero drops. Browser checks confirmed the final inline heater control
-and automatic shutoff while sampling was paused, then soft reset and resumed acquisition.
+## Failure diagnosis and correction
 
-Environment: Windows, Python 3.12.14, Dash 3.4.0, Plotly 7.1.0, hidapi 0.15.0,
-Ruff 0.16.8; dependencies locked in uv.lock. Tests outside the sandbox were needed
-for Python temporary-directory ACL compatibility, not device access.
+The initial configuration enabled bridge-managed I2C pullups. USB2ANY returned
+error `-54` on the first sensor command. TI defines this as missing 3.3 V EXT
+power for those bridge pullups, while the EVM schematic shows its own 10 kΩ
+pullups on the USB-powered 3.3 V rail ([protocol details](../docs/protocol.md),
+E012/D003). Disabling bridge pullups resolved the error without a board-power
+command. The identity diagnostic preceded renewed acquisition; all subsequent
+physical checks passed. No firmware, EEPROM, offset, threshold, general-call
+reset or external power setting was changed.
 
-## Limits and assumptions
+## Remaining validation and operation
 
-Actual HDC3020EVM VID/PID, firmware compatibility, pullup settings and raw-read
-framing require confirmation. They are grounded in the TMP bridge and TI HDC GUI;
-fakes do not prove board compatibility. Manufacturer 0x3000 plus NIST response is
-useful identity evidence, not a unique model identifier. See [protocol.md](../docs/protocol.md).
+The [physical procedure](../docs/hardware-validation.md) documents exact
+commands and expected results; the [quick start](../docs/quick-start.md) covers
+normal use. The only remaining physical control check is
+one attended, minimum-element (`0x0001`) five-second heater pulse with no
+heat-sensitive sample or equipment nearby, followed by status-off verification
+and cooldown observation. A bounded runner is prepared and has passed its
+simulator rehearsal (E020). Keep the heater off until that separate scope is
+explicitly granted. A connection loss can prevent software from confirming
+heater shutdown; unplug the EVM if heater status is uncertain. Physical browser
+rendering was not separately inspected; actual HTTP callbacks were exercised
+with hardware and browser visuals were checked in simulation.
 
-Physical conversion timing, auto-latch behavior, recovery and thermal behavior
-remain unverified. No calibrated accuracy claim is made. Heater timing is host-managed,
-best-effort; loss of communication or host control cannot guarantee shutoff. Unplug
-the EVM if shutdown is uncertain. Heater-on and cooldown readings are not ambient readings.
+**Resumption condition:** an explicit yes/no answer to the single-pulse request
+in STATE.md. A yes must confirm the board will be attended and no heat-sensitive
+samples or equipment are nearby. A no leaves the heater requirement physically
+unvalidated. No useful independent work remains at this checkpoint (E022).
 
-Run only one local process per board. No EEPROM programming, firmware flashing,
-general-call reset, threshold/offset editor or board power switching is exposed.
-
-## Requested next authorization
-
-Connect one stock HDC3020EVM by USB, close TI's GUI, and approve this candidate for
-**identity, 30 one-second paired samples, CSV verification, close/reopen**, with
-**heater kept off**. Exact first interactions, acceptance checks and recovery:
-[hardware-validation.md](../docs/hardware-validation.md).
-
-After approval:
-
-```powershell
-uv run --extra usb python -m hdcsensor.validate --hardware --samples 30 --interval 1
-```
-
-First: filtered HID discovery and firmware identity, I2C setup, CRC-checked TI/NIST
-identity; then heater-off, exit-auto, and on-demand acquisition. Cleanup attempts
-heater-off/exit-auto and closes HID. Physically unplug on uncertain shutdown.
-Preserve JSON/CSV evidence. Physical control validation follows reliable V1 acquisition;
-heater-on testing requires separate explicit scope.
+For normal shutdown, stop recording, stop monitoring and disconnect. The worker
+attempts heater-off, exit-auto and HID close. On a fault, preserve JSON/CSV
+evidence and check actual device state before reconnecting. Volatile mode/LPM
+changes and soft reset are restored to on-demand LPM0 at the next connection;
+no persistent sensor memory is intentionally written. Run only one local
+process per board. The system makes no calibrated accuracy or production
+readiness claim until the outstanding requirements are addressed.

@@ -1,0 +1,31 @@
+{
+  "backend": "simulation",
+  "physical_validation": false,
+  "passed": true,
+  "started_utc": "2026-09-23T20:13:53.219373+00:00",
+  "checks": {
+    "http_routes": true,
+    "physical_session": true,
+    "paired_live_values": true,
+    "paired_plots": true,
+    "recording_drained": true,
+    "recorded_pairs": true,
+    "buffer_export": true,
+    "saved_csv_download": true,
+    "settings_applied": true,
+    "settings_page": true,
+    "clean_disconnect": true
+  },
+  "errors": [],
+  "identity": {
+    "source": "SIMULATED HDC3020 (no hardware)",
+    "serial_number": "SIMULATION",
+    "firmware_version": "simulation-1",
+    "manufacturer_id": 12288,
+    "nist_id": "0123456789AB",
+    "address": 68
+  },
+  "sample_count": 3,
+  "csv": "C:\\projects\\ti-hdc-sensor-monitor\\outputs\\simulation-validation\\hdc3020_20260923_201353_501772.csv",
+  "completed_utc": "2026-09-23T20:13:56.008976+00:00"
+}

@@ -1,8 +1,9 @@
-# Candidate review and physical validation
+# Physical validation procedure and results
 
-No real HID discovery, open or physical measurement has been performed in this project.
-Review outputs/REPORT.md before authorizing a hardware session. Software/simulation
-results do not establish hardware compatibility or sensor calibration.
+Under H007, TEST-005 and the non-heater portion of TEST-006 were run on one
+connected HDC3020EVM on 2026-09-23. See E012–E019 and outputs/REPORT.md for
+results. The procedures below remain reproducible; sensor calibration and
+heater-on behavior are not established by those results.
 
 ## First authorized interaction (TEST-005)
 
@@ -12,8 +13,9 @@ TI GUI closed. No EEPROM, firmware, offset, threshold, general-call reset or hea
 1. Disconnect any dashboard device session. Connect the board by USB.
 2. Run `uv run --extra usb python -m hdcsensor.validate --hardware --samples 30 --interval 1`.
 3. First operations: enumerate only VID/PID 2047:0301; require exactly one matching
-   board (or explicit serial); open; firmware command 0A; I2C 100 kHz/7-bit/pullups;
-   manufacturer 3781 and NIST 3683/84/85. A wrong manufacturer causes immediate close.
+   board (or explicit serial); open; firmware command 0A; I2C 100 kHz/7-bit with
+   bridge pullups disabled (stock EVM has on-board pullups); manufacturer 3781
+   and NIST 3683/84/85. A wrong manufacturer causes immediate close.
 4. Initialization: heater off 3066, status F32D verification, exit auto 3093.
    Acquire with 2400, wait 16 ms, read six bytes, read status. No CRC-failed pair is logged.
 5. Inspect the JSON report: at least 30 pairs, no failed reads/dropped CSV rows,
@@ -27,6 +29,14 @@ If VID/PID differ, stop and identify the board/firmware before modifying discove
 On NAK/CRC errors, save the report and check device ownership and stock wiring.
 Avoid changing multiple transport assumptions at once.
 
+Actual TEST-005 result: the first attempt failed with USB2ANY error -54 because
+bridge-managed pullups were selected without its 3.3 V EXT output. The stock EVM
+schematic shows passive 10 kΩ I2C pullups to its USB-powered 3.3 V rail. D003
+disabled bridge pullups; the corrected run passed 30 paired samples, matching
+CSV, 1.000613 s median interval, zero failures, and clean close/reopen/close
+(E015). The dashboard's physical callbacks then passed plots, recording,
+export/download and disconnect (E019).
+
 ## Controls (TEST-006, after V1 succeeds)
 
 Record device identity, board/firmware and before/after status. With explicit scope:
@@ -36,11 +46,22 @@ reset tracking flags; soft reset and check on-demand LPM0/heater-off defaults.
 Commands without readable mode state are established by acknowledged command and
 subsequent behavior, not claimed register readback.
 
+Non-heater TEST-006 PASS (E017): all 12 mode/LPM combinations yielded valid
+paired values, auto 1 Hz/0.5 Hz median intervals were 1.0172985/2.0151055 s,
+status 0x8010 cleared to 0x0000, soft reset restored the reset flag and defaults,
+and the session closed without read failures. Reproduce with
+`uv run --extra usb python -m hdcsensor.validate_controls --hardware --output
+outputs/hardware-validation`.
+
 Heater testing requires separate explicit inclusion in approval: minimum element
 0x0001 for one five-second pulse only, board attended, no samples/equipment exposed
 to heat. Confirm status bit 13 rises and clears, CSV flag/plot marker appear, and
 the sensor returns toward ambient after cooldown. The software cannot certify an
 environment-specific thermal limit. Skip this test unless the setup permits heating.
+After that separate approval, run `uv run --extra usb python -m hdcsensor.validate_heater
+--hardware --confirm-attended --output outputs/hardware-validation`. This bounded runner was
+rehearsed only in simulation (E020); its report preserves actual temperatures,
+RH and status/CSV checks. Do not interpret cooldown values as calibrated accuracy.
 
 ## Stop and recovery
 

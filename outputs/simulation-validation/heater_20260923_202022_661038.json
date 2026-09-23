@@ -1,0 +1,39 @@
+{
+  "backend": "simulation",
+  "physical_validation": false,
+  "passed": true,
+  "started_utc": "2026-09-23T20:20:22.661038+00:00",
+  "checks": {
+    "initial_heater_off": true,
+    "heater_status_on": true,
+    "heater_still_on_when_paused": true,
+    "automatic_heater_off": true,
+    "pulse_duration": true,
+    "final_heater_status_off": true,
+    "heater_affected_pairs": true,
+    "plot_heater_markers": true,
+    "csv_heater_flags": true,
+    "no_recording_loss": true,
+    "no_read_failures": true,
+    "clean_disconnect": true
+  },
+  "errors": [],
+  "identity": {
+    "source": "SIMULATED HDC3020 (no hardware)",
+    "serial_number": "SIMULATION",
+    "firmware_version": "simulation-1",
+    "manufacturer_id": 12288,
+    "nist_id": "0123456789AB",
+    "address": 68
+  },
+  "csv": "C:\\projects\\ti-hdc-sensor-monitor\\outputs\\simulation-validation\\heater-validation_20260923_202022_693926.csv",
+  "pulse_duration_s": 5.047000000020489,
+  "baseline_temperature_c": 23.20820935378042,
+  "peak_heater_temperature_c": 24.40718699931334,
+  "final_temperature_c": 23.149462119478144,
+  "baseline_humidity_pct": 47.19005111772336,
+  "final_humidity_pct": 47.4692912184329,
+  "sample_count": 13,
+  "heater_on_sample_count": 2,
+  "completed_utc": "2026-09-23T20:20:37.174304+00:00"
+}

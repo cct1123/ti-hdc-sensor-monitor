@@ -1,0 +1,15 @@
+{
+  "backend": "usb_hid",
+  "physical_validation": true,
+  "passed": false,
+  "started_utc": "2026-09-23T20:05:36.567859+00:00",
+  "requested_samples": 30,
+  "requested_interval_s": 1.0,
+  "errors": [
+    "RuntimeError: SensorError: USB2ANY command 0x02: device error -54",
+    "SensorError: USB2ANY command 0x02: device error -54"
+  ],
+  "checks": {},
+  "csv": "C:\\projects\\ti-hdc-sensor-monitor\\outputs\\hardware-validation\\hardware-validation_20260923_200536_567859.csv",
+  "completed_utc": "2026-09-23T20:05:36.780777+00:00"
+}

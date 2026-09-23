@@ -1,0 +1,142 @@
+{
+  "backend": "usb_hid",
+  "physical_validation": true,
+  "passed": true,
+  "started_utc": "2026-09-23T20:12:08.417991+00:00",
+  "checks": {
+    "initial_heater_off": true,
+    "identity_stable": true,
+    "reset_flag_cleared": true,
+    "on_demand_lpm0_paired": true,
+    "on_demand_lpm1_paired": true,
+    "on_demand_lpm2_paired": true,
+    "on_demand_lpm3_paired": true,
+    "auto_1hz_lpm0_paired": true,
+    "auto_1hz_cadence": true,
+    "auto_1hz_lpm1_paired": true,
+    "auto_1hz_lpm2_paired": true,
+    "auto_1hz_lpm3_paired": true,
+    "auto_0.5hz_lpm0_paired": true,
+    "auto_0.5hz_cadence": true,
+    "auto_0.5hz_lpm1_paired": true,
+    "auto_0.5hz_lpm2_paired": true,
+    "auto_0.5hz_lpm3_paired": true,
+    "reset_defaults": true,
+    "post_reset_pair": true,
+    "post_reset_flag_cleared": true,
+    "no_read_failures": true,
+    "clean_disconnect": true
+  },
+  "modes": [
+    {
+      "mode": "on_demand",
+      "low_power": 0,
+      "sample_count": 1,
+      "median_interval_s": null,
+      "first_temperature_c": 23.16548409246967,
+      "first_relative_humidity_pct": 46.616311894407566
+    },
+    {
+      "mode": "on_demand",
+      "low_power": 1,
+      "sample_count": 1,
+      "median_interval_s": null,
+      "first_temperature_c": 23.16548409246967,
+      "first_relative_humidity_pct": 46.623941405355914
+    },
+    {
+      "mode": "on_demand",
+      "low_power": 2,
+      "sample_count": 1,
+      "median_interval_s": null,
+      "first_temperature_c": 23.186846723125043,
+      "first_relative_humidity_pct": 46.619363698786906
+    },
+    {
+      "mode": "on_demand",
+      "low_power": 3,
+      "sample_count": 1,
+      "median_interval_s": null,
+      "first_temperature_c": 23.058670939192794,
+      "first_relative_humidity_pct": 46.61173418783856
+    },
+    {
+      "mode": "auto_1hz",
+      "low_power": 0,
+      "sample_count": 3,
+      "median_interval_s": 1.0172984999999999,
+      "first_temperature_c": 23.16548409246967,
+      "first_relative_humidity_pct": 46.616311894407566
+    },
+    {
+      "mode": "auto_1hz",
+      "low_power": 1,
+      "sample_count": 1,
+      "median_interval_s": null,
+      "first_temperature_c": 23.101396200503544,
+      "first_relative_humidity_pct": 46.60868238345922
+    },
+    {
+      "mode": "auto_1hz",
+      "low_power": 2,
+      "sample_count": 1,
+      "median_interval_s": null,
+      "first_temperature_c": 23.12275883115892,
+      "first_relative_humidity_pct": 46.536964980544745
+    },
+    {
+      "mode": "auto_1hz",
+      "low_power": 3,
+      "sample_count": 1,
+      "median_interval_s": null,
+      "first_temperature_c": 23.01861600671397,
+      "first_relative_humidity_pct": 46.5995269703212
+    },
+    {
+      "mode": "auto_0.5hz",
+      "low_power": 0,
+      "sample_count": 3,
+      "median_interval_s": 2.0151054999999998,
+      "first_temperature_c": 23.144121461814294,
+      "first_relative_humidity_pct": 46.68192568856336
+    },
+    {
+      "mode": "auto_0.5hz",
+      "low_power": 1,
+      "sample_count": 1,
+      "median_interval_s": null,
+      "first_temperature_c": 23.101396200503544,
+      "first_relative_humidity_pct": 46.64682993820096
+    },
+    {
+      "mode": "auto_0.5hz",
+      "low_power": 2,
+      "sample_count": 1,
+      "median_interval_s": null,
+      "first_temperature_c": 23.039978637369344,
+      "first_relative_humidity_pct": 46.706340123598075
+    },
+    {
+      "mode": "auto_0.5hz",
+      "low_power": 3,
+      "sample_count": 1,
+      "median_interval_s": null,
+      "first_temperature_c": 22.997253376058595,
+      "first_relative_humidity_pct": 45.50850690470741
+    }
+  ],
+  "errors": [],
+  "identity": {
+    "source": "HDC3020EVM USB HID at 0x44",
+    "serial_number": "88F2A26E25000200",
+    "firmware_version": "2.8.2.0",
+    "manufacturer_id": 12288,
+    "nist_id": "1A73E0120F3E",
+    "address": 68
+  },
+  "status_before_clear": 32784,
+  "status_after_clear": 0,
+  "status_after_reset": 32784,
+  "failed_reads": 0,
+  "completed_utc": "2026-09-23T20:12:27.484815+00:00"
+}

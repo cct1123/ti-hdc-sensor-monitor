@@ -1,20 +1,16 @@
 # Illustrated usage guide
 
-Follow **start → inspect → record → adjust settings → disconnect**. Screenshots were
+Follow **start → inspect → record → adjust settings → disconnect**. For the
+shortest first-use path, see the [quick start](quick-start.md). Screenshots were
 captured from this application's simulator on Windows. Values, USB identity and
-NIST serial in the images are simulated; physical validation is pending.
+NIST serial in the images are simulated; physical acquisition, CSV, dashboard
+callbacks and non-heater controls later passed on the EVM (see the
+[validation report](../outputs/REPORT.md)).
 
-## 1. Start your first session
+## 1. Inspect the monitor
 
-From the repository folder, run:
-
-```powershell
-uv run python app.py --simulate
-```
-
-Open [the dashboard](http://127.0.0.1:8050/), confirm **Simulation · no hardware**,
-and click **Start monitoring**. The header changes to **Monitoring**, the source reads
-**SIMULATED HDC3020 (no hardware)**, and the temperature/RH pair updates about once a second.
+Start with the [quick start](quick-start.md), then watch the temperature/RH
+pair update about once a second. The header shows the current connection state.
 
 ![Simulator acquiring paired readings, updating statistics and history, and recording new samples](images/monitor-overview.jpg)
 
@@ -29,11 +25,9 @@ Statistics cover the whole buffer. Up to 7,200 pairs are retained, about two hou
 at the default interval; older pairs roll out as new ones arrive. **Clear data** clears
 the buffer and statistics but does not remove recordings.
 
-For a physical board, install with `uv sync --extra usb`, launch with
-`uv run --extra usb python app.py`, close TI's GUI, and choose **USB / USB2ANY HID**
-with stock address **0x44**. **Connect** initializes on-demand LPM0 and heater-off
-without sampling. **Start monitoring** connects and acquires. The hardware path awaits
-approval under the [hardware validation procedure](hardware-validation.md).
+**Connect** identifies the board and selects on-demand LPM0 with heater off;
+**Start monitoring** begins acquisition. Heater-on testing still requires
+separate scope under the [hardware validation procedure](hardware-validation.md).
 
 ## 2. Browse history and return to live
 
@@ -152,25 +146,13 @@ test. If cleanup fails, resolve the error and unplug the EVM when shutdown is un
 | --- | --- |
 | No USB2ANY/OneDemo EVM found | Check USB and close TI's GUI. Confirm board/firmware assumptions in the [protocol notes](protocol.md); do not flash firmware as a shortcut. |
 | Multiple compatible boards found | Connect one board or enter its USB serial before connecting. |
-| Missing HID dependency | Run `uv sync --extra usb`, then `uv run --extra usb python app.py`. |
+| Missing HID dependency | Start with `uv run --extra usb python app.py` so uv includes the USB dependency. |
+| USB2ANY error -54 | The bridge's internal I²C pullups need its separate 3.3 V EXT output. The stock EVM already has on-board pullups, so this app disables bridge pullups (E012/D003). Verify this is a stock board and use the current code. |
 | CRC, NAK or failed reads | Check connection, address and device ownership. Three consecutive failures close the session; reconnect after resolving the cause. |
 | A settings command fails | The session closes because a timed-out write may have taken effect. Reconnect to establish known state. |
 | Download last CSV is disabled | Start a recording, stop it, and allow the writer to finish. Inspect writer errors if it stays unavailable. |
 | Old values remain visible | Check timestamp and connection. Pausing/disconnecting retains history; it does not imply new acquisition. |
 | Plots stopped following data | Click **Follow live · 5 min** to leave the held range. |
 | Default port is busy | Use `uv run python app.py --simulate --port 8051` and open `http://127.0.0.1:8051/`. Never run two processes against one board. |
-
-## Installation without uv
-
-Use Python 3.9 or newer; the checked environment is Python 3.12 on Windows:
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python -m pip install "dash>=2.18,<4" "hidapi>=0.15,<1"
-.\.venv\Scripts\python app.py --simulate
-```
-
-Omit `--simulate` when preparing to connect USB hardware. Simulator preselection
-does not prevent a user from deliberately selecting USB later.
 
 [Back to README](../README.md) · [Validation evidence](../outputs/REPORT.md)

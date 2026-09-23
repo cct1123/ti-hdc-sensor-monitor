@@ -26,9 +26,11 @@ History limit: 7,200 paired samples, derived from TMP monitor. All clients share
 References: docs/protocol.md. Reused MIT code retains LICENSE and provenance in NOTICE.md.
 
 ## Boundaries and unknowns
-No real hardware has been opened or enumerated. Board availability, identity and firmware are unknown.
-Follow AGENTS.md's explicit candidate-review gate before physical integration.
+At initial setup, board availability, identity and firmware were unknown. H007
+approved the reviewed candidate's physical integration on 2026-09-23; current
+device details and validation status are in STATE.md and outputs/REPORT.md.
+Follow AGENTS.md's explicit candidate-review gate for future unapproved scopes.
 No firmware flashing, EEPROM/offset programming, general-call reset or board power control.
 Heater controls must show their effect on measurement validity and shut off on orderly disconnect;
 loss of USB communication cannot guarantee heater shutdown. Physical heater testing needs explicit scope.
-Sensor accuracy and calibration are not established by protocol/software tests.
+Sensor accuracy and calibration require independent physical evidence.

@@ -1,0 +1,41 @@
+test_bad_user_input_is_displayed_without_starting_worker (test_dashboard.DashboardTests.test_bad_user_input_is_displayed_without_starting_worker) ... ok
+test_heater_acknowledgement_and_soft_reset_callbacks (test_dashboard.DashboardTests.test_heater_acknowledgement_and_soft_reset_callbacks) ... ok
+test_http_simulated_flow_plot_record_export_pause_settings_disconnect (test_dashboard.DashboardTests.test_http_simulated_flow_plot_record_export_pause_settings_disconnect) ... ok
+test_channels_share_time_axis_and_historical_view (test_dashboard.PlotTests.test_channels_share_time_axis_and_historical_view) ... ok
+test_empty_and_invalid_range (test_dashboard.PlotTests.test_empty_and_invalid_range) ... ok
+test_both_crc_words_required_and_truncation_rejected (test_protocol.ProtocolTests.test_both_crc_words_required_and_truncation_rejected) ... ok
+test_conversion_endpoints_and_midpoint (test_protocol.ProtocolTests.test_conversion_endpoints_and_midpoint) ... ok
+test_empty_auto_readouts_are_not_samples (test_protocol.ProtocolTests.test_empty_auto_readouts_are_not_samples) ... ok
+test_ti_crc_vectors (test_protocol.ProtocolTests.test_ti_crc_vectors) ... ok
+test_validation_rejects_nonfinite_and_invalid_inputs (test_protocol.ProtocolTests.test_validation_rejects_nonfinite_and_invalid_inputs) ... ok
+test_bounded_queue_nonblocking_and_drain_before_download_ready (test_recording.RecorderTests.test_bounded_queue_nonblocking_and_drain_before_download_ready) ... ok
+test_disk_failure_is_visible_and_accepted_rows_count_as_lost (test_recording.RecorderTests.test_disk_failure_is_visible_and_accepted_rows_count_as_lost) ... ok
+test_mid_stream_flush_failure_counts_failed_row (test_recording.RecorderTests.test_mid_stream_flush_failure_counts_failed_row) ... ok
+test_auto_and_low_power_command_mapping (test_sensor.SensorTests.test_auto_and_low_power_command_mapping) ... ok
+test_bad_identity_releases_transport_without_sensor_writes (test_sensor.SensorTests.test_bad_identity_releases_transport_without_sensor_writes) ... ok
+test_cleanup_attempts_both_commands_and_releases_even_on_error (test_sensor.SensorTests.test_cleanup_attempts_both_commands_and_releases_even_on_error) ... ok
+test_fresh_measurement_waits_for_max_conversion (test_sensor.SensorTests.test_fresh_measurement_waits_for_max_conversion) ... ok
+test_heater_verified_and_reset_restores_defaults (test_sensor.SensorTests.test_heater_verified_and_reset_restores_defaults) ... ok
+test_identity_and_initial_state (test_sensor.SensorTests.test_identity_and_initial_state) ... ok
+test_all_io_owned_by_one_worker_and_pause_resume (test_session.SessionTests.test_all_io_owned_by_one_worker_and_pause_resume) ... ok
+test_bad_crc_never_published_and_stops_after_three (test_session.SessionTests.test_bad_crc_never_published_and_stops_after_three) ... ok
+test_buffer_recording_and_export_keep_paired_metadata (test_session.SessionTests.test_buffer_recording_and_export_keep_paired_metadata) ... ok
+test_disconnect_cancels_queue_and_reconnect_has_new_generation (test_session.SessionTests.test_disconnect_cancels_queue_and_reconnect_has_new_generation) ... ok
+test_heater_expires_while_sampling_paused_and_reset_defaults (test_session.SessionTests.test_heater_expires_while_sampling_paused_and_reset_defaults) ... ok
+test_invalid_config_does_not_disconnect_but_io_failure_does (test_session.SessionTests.test_invalid_config_does_not_disconnect_but_io_failure_does) ... ok
+test_queue_is_bounded (test_session.SessionTests.test_queue_is_bounded) ... ok
+test_transient_crc_failure_recovers_and_reports_counter (test_session.SessionTests.test_transient_crc_failure_recovers_and_reports_counter) ... ok
+test_late_fetch_does_not_shift_autonomous_conversion_clock (test_simulation.SimulationTimingTests.test_late_fetch_does_not_shift_autonomous_conversion_clock) ... ok
+test_bridge_crc_known_vectors (test_usb_hid.HIDTests.test_bridge_crc_known_vectors) ... ok
+test_input_validation_before_io (test_usb_hid.HIDTests.test_input_validation_before_io) ... ok
+test_missing_ambiguous_and_serial_selection (test_usb_hid.HIDTests.test_missing_ambiguous_and_serial_selection) ... ok
+test_nak_timeout_short_write_and_unplug (test_usb_hid.HIDTests.test_nak_timeout_short_write_and_unplug) ... ok
+test_raw_framing_matches_ti_hdc_gui (test_usb_hid.HIDTests.test_raw_framing_matches_ti_hdc_gui) ... ok
+test_real_driver_over_fake_hid_bridge (test_usb_hid.HIDTests.test_real_driver_over_fake_hid_bridge) ... ok
+test_stale_async_replies_wrap_and_reopen (test_usb_hid.HIDTests.test_stale_async_replies_wrap_and_reopen) ... ok
+test_truncated_corrupt_and_short_responses (test_usb_hid.HIDTests.test_truncated_corrupt_and_short_responses) ... ok
+
+----------------------------------------------------------------------
+Ran 36 tests in 2.730s
+
+OK

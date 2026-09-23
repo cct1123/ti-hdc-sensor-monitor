@@ -1,0 +1,4 @@
+identity: DeviceIdentity(source='HDC3020EVM USB HID at 0x44', serial_number='88F2A26E25000200', firmware_version='2.8.2.0', manufacturer_id=12288, nist_id='1A73E0120F3E', address=68)
+status: 0x8010
+bridge_firmware: 2.8.2.0
+closed: yes

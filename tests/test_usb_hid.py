@@ -62,7 +62,7 @@ class HIDTests(unittest.TestCase):
         self.transport.open()
         self.transport.write(b"\x24\x00")
         self.assertEqual(self.transport.read(3), b"\xab\xcd\x6f")
-        self.assertEqual(self.device.writes[1][9:13], bytes([1, 0, 0, 1]))
+        self.assertEqual(self.device.writes[1][9:13], bytes([1, 0, 0, 0]))
         self.assertEqual(self.device.writes[2][9:15], bytes([2, 0, 0x44, 2, 0x24, 0]))
         self.assertEqual(self.device.writes[3][9:14], bytes([3, 0, 0x44, 3, 0]))
         self.assertEqual(self.transport.firmware_version, "2.7.0.16")
@@ -106,6 +106,9 @@ class HIDTests(unittest.TestCase):
         self.transport.open()
         self.device.pending.append(reply(3, 3, kind=3, status=212))
         with self.assertRaisesRegex(SensorError, "not acknowledged"):
+            self.transport.read(3)
+        self.device.pending.append(reply(4, 3, kind=3, status=202))
+        with self.assertRaisesRegex(SensorError, "3.3 V EXT power"):
             self.transport.read(3)
         self.transport.timeout_s = 0.001
         with (

@@ -1,0 +1,4 @@
+timestamp_utc,sequence,temperature_c,relative_humidity_pct,source,raw_temperature,raw_humidity,mode,low_power,heater_on
+2026-09-23T20:13:53.524423+00:00,1,23.662165,47.200732,SIMULATED HDC3020 (no hardware),25713,30933,on_demand,0,0
+2026-09-23T20:13:54.540900+00:00,2,23.675517,47.229725,SIMULATED HDC3020 (no hardware),25718,30952,on_demand,0,0
+2026-09-23T20:13:55.537472+00:00,3,23.686198,47.257191,SIMULATED HDC3020 (no hardware),25722,30970,on_demand,0,0
