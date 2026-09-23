@@ -401,3 +401,12 @@ manifest matches digest
 relative links in six documents resolve. No device command was issued under
 H010. Before publication, origin/main was independently checked at
 `6514201add0143c38b05099108b1a9a91a1ed516`. Heater-on remains UNTESTED.
+
+## E026 - H010 source and evidence publication (2026-09-23)
+Committed the 30 reviewed source, documentation, record and evidence files as
+`ae8a3f48bae58bb49e8702b8953cf6cd74762983` and pushed a normal
+fast-forward from `6514201` to `origin/main`. An independent `git ls-remote`
+returned exactly `ae8a3f48bae58bb49e8702b8953cf6cd74762983` for
+`refs/heads/main`, matching local HEAD; the worktree was clean. This checkpoint
+record is a small follow-up commit. Publication does not alter the
+E022 heater-scope boundary or establish physical heater validation.

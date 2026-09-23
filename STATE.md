@@ -1,10 +1,10 @@
 # Current checkpoint
 
 Phase: **BLOCKED** (resume **HARDWARE_VALIDATION** after heater-scope input)
-Checkpoint: 2026-09-23 16:15 America/Chicago, H010 review passed (E025)
+Checkpoint: 2026-09-23 16:14 America/Chicago, H010 source push verified (E026)
 Last applied human input: H010
-Owner: current Codex session since 2026-09-23 16:11 America/Chicago. Staleness
-window 24 h, after checking task liveness.
+Owner: released at 2026-09-23 16:14 America/Chicago. Staleness window 24 h,
+after checking task liveness.
 
 ## Current result
 
@@ -49,9 +49,10 @@ reference was supplied; the observed 23 °C / 45–47 %RH is plausibility only.
 Dash callbacks → AcquisitionService → queued DeviceSession worker → HDC3020Sensor
 → USB2ANYHIDTransport (or simulator). Paired sample buffer and separate CSV
 writer. History limit 7,200 pairs. See ARCHITECTURE.md and docs/protocol.md.
-The published baseline is `6514201` on origin/main under H006 (E011); physical
-fixes/evidence are local worktree changes. H010 authorizes review, commit and
-push; prepublication review passed (E025).
+The H010 reviewed source, documentation and evidence commit is
+`ae8a3f48bae58bb49e8702b8953cf6cd74762983` on origin/main (E025/E026).
+The earlier `6514201` baseline was fast-forwarded. This checkpoint records the
+publication result.
 
 ## Human action required
 
@@ -70,17 +71,14 @@ as an unvalidated requirement and report that limit.
 
 ## Loop continuity
 
-In-flight operation: commit the reviewed H010 source, docs, records and evidence,
-then push `main` to origin as a fast-forward from
-`6514201add0143c38b05099108b1a9a91a1ed516`. Expected effect: origin/main
-references the new commit. Verify with `git ls-remote origin refs/heads/main`
-and compare to local HEAD; if interrupted, inspect both refs before retrying.
-No force push. All physical processes exited; TEST-005 and the
+In-flight operation: none. The H010 source push was verified against origin/main
+(E026). All
+physical processes exited; TEST-005 and the
 non-heater controls/dashboard checks reported clean close (E015/E017/E019).
 Do not infer current device state solely from those reports before another
 interaction; enumerate and establish known state again under valid scope.
-H009 Bash/uv quick start is complete (E024). H010 review passed (E025);
-publication is pending. The physical heater test remains
+H009 Bash/uv quick start is complete (E024). H010 review and source publication
+passed (E025/E026). The physical heater test remains
 blocked on separate authorization (E022). Gap attempt count 0; one
 asynchronous specific-scope request has been sent. Do not run the physical
 heater test while that request is unresolved. Resume hardware validation after
