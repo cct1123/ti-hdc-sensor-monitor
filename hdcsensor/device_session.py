@@ -8,7 +8,7 @@ import time
 from concurrent.futures import Future
 from dataclasses import replace
 
-from .errors import SensorError
+from .errors import HIDTransportError, SensorError
 from .models import DeviceSnapshot
 from .protocol import MODE_PERIODS, validate_interval, validate_settings
 
@@ -39,6 +39,7 @@ class DeviceSession:
         self._queue = queue.Queue(maxsize=queue_size)
         self._heater_deadline = None
         self._next_sample = 0.0
+        self._recovery_available = False
 
     def snapshot(self):
         with self._lock:
@@ -56,6 +57,7 @@ class DeviceSession:
             self._stop = threading.Event()
             self._queue = queue.Queue(maxsize=self._queue_size)
             self._heater_deadline = None
+            self._recovery_available = sampling
             self._snapshot = DeviceSnapshot(
                 connection="connecting",
                 interval_s=interval_s,
@@ -109,15 +111,42 @@ class DeviceSession:
     def _take_sample(self, sensor):
         reading = sensor.read_measurement()
         self._on_sample(reading, sensor.name, sensor.mode, sensor.low_power)
+        self._recovery_available = False
         self._publish_device(sensor, consecutive_failures=0, last_error=None)
+
+    def _reopen_after_hid_failure(self, sensor):
+        state = self.snapshot()
+        if state.heater_on or self._heater_deadline is not None:
+            raise SensorError("USB HID failed during a heater pulse; shutdown state is uncertain")
+        previous_identity = sensor.identity
+        previous_mode, previous_low_power = sensor.mode, sensor.low_power
+        try:
+            sensor.close()
+        except SensorError:
+            # The stale HID handle may reject shutdown commands. A successful
+            # open below verifies heater-off on the newly opened handle.
+            pass
+        if self._stop.is_set():
+            raise SensorError("Disconnect requested before USB HID reopen")
+        sensor.open(expected_identity=previous_identity)
+        if previous_mode != "on_demand" or previous_low_power != 0:
+            sensor.configure(previous_mode, previous_low_power)
+        self._publish_device(
+            sensor,
+            consecutive_failures=0,
+            last_error=None,
+            note="USB HID handle reopened after failure; monitoring resumed.",
+        )
 
     def _execute(self, sensor, kind, args):
         if kind == "resume":
             interval = validate_interval(args.get("interval_s", self.snapshot().interval_s))
+            self._recovery_available = True
             self._update(sampling=True, interval_s=interval)
             self._next_sample = time.monotonic() + (self._period() if sensor.mode != "on_demand" else 0)
             message = "Monitoring started."
         elif kind == "pause":
+            self._recovery_available = False
             self._update(sampling=False)
             message = "Sampling paused; device remains connected."
         elif kind == "configure":
@@ -186,6 +215,17 @@ class DeviceSession:
                 if self.snapshot().sampling and now >= self._next_sample:
                     try:
                         self._take_sample(sensor)
+                    except HIDTransportError:
+                        state = self.snapshot()
+                        self._update(failures=state.failures + 1, consecutive_failures=1)
+                        if not self._recovery_available:
+                            raise
+                        self._recovery_available = False
+                        self._reopen_after_hid_failure(sensor)
+                        self._next_sample = time.monotonic() + (
+                            self._period() if sensor.mode != "on_demand" else 0
+                        )
+                        continue
                     except SensorError as exc:
                         state = self.snapshot()
                         self._update(

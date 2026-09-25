@@ -56,10 +56,16 @@ class HDC3020Sensor:
         )
         return self.identity
 
-    def open(self):
+    def open(self, expected_identity=None):
         self.transport.open()
         try:
             self.read_identity()
+            if expected_identity is not None and (
+                self.identity.serial_number != expected_identity.serial_number
+                or self.identity.nist_id != expected_identity.nist_id
+                or self.identity.address != expected_identity.address
+            ):
+                raise SensorError("Reconnected sensor identity changed; monitoring stopped")
             # Establish known volatile state, only after the identity check passes.
             self._initialized = True
             self.set_heater(False)
@@ -122,7 +128,7 @@ class HDC3020Sensor:
                 try:
                     self.command(command)
                 except Exception as exc:
-                    errors.append(str(exc))
+                    errors.append(f"shutdown command 0x{command:04X}: {exc}")
             self._initialized = False
         try:
             self.transport.close()

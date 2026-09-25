@@ -29,6 +29,18 @@ non-heater run with auto-save unchecked to verify no automatic file is made;
 manual **Record** must still work. The UTC boundary is covered by the
 deterministic software TEST-003; no physical midnight wait is required.
 
+For the H020 reconnect regression, after normal heater-off monitoring has
+produced at least two CSV rows, click **Stop** and confirm sampling pauses.
+With the operator present, unplug/replug the EVM's USB cable once and wait for
+the same serial to enumerate. Click **Start monitoring** once. If the held HID
+handle fails, the worker may reopen it once; verify the NIST ID is unchanged,
+monitoring resumes, the same CSV file receives new paired rows with increasing
+timestamps, and no heater-on state appears. If identity changes, reopen fails,
+or the status stays in Error, stop the check and preserve the exact UI error.
+Click **Disconnect** and verify the file drains. This cable-cycle check is a
+separate action within the revised candidate's requested approval; it was not
+performed during software development.
+
 If identity, paired acquisition, CSV agreement, cleanup, or error reporting
 fails, stop and preserve the exact report/CSV/UI error. On clean shutdown the
 worker attempts heater-off, exit-auto, and HID close. If device status becomes

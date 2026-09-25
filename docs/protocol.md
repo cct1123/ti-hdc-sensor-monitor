@@ -79,3 +79,6 @@ hardware, NIST responses and actual measurements remain part of physical validat
 USB2ANY `-49` means an I²C write timeout in [TI's USB2ANY SDK API reference](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/196/0116.API-Reference-for-USB2ANY-SDK-2.8.pdf).
 With no USB serial, the transport selects a bridge only when HID enumeration
 returns exactly one. It cannot infer which connected bridge carries an HDC3020.
+At the HID layer, [HIDAPI specifies](https://github.com/libusb/hidapi/blob/master/hidapi/hidapi.h)
+that `hid_write` returns `-1` on error; that return alone does not identify the
+physical cause. The transport includes HIDAPI's native error text when available.

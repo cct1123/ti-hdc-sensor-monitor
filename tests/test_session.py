@@ -9,9 +9,27 @@ from unittest.mock import Mock, patch
 
 from hdcsensor.acquisition import AcquisitionService
 from hdcsensor.device_session import DeviceSession
-from hdcsensor.errors import CRCError, SensorError
+from hdcsensor.errors import CRCError, HIDTransportError, SensorError
 from hdcsensor.recording import export_csv
-from hdcsensor.sensors import create_sensor
+from hdcsensor.sensors import HDC3020Sensor, create_sensor
+from hdcsensor.simulation import SimulatedTransport
+
+
+class RepluggedTransport(SimulatedTransport):
+    def __init__(self):
+        super().__init__()
+        self.open_count = 0
+        self.stale_handle = False
+
+    def open(self):
+        super().open()
+        self.open_count += 1
+        self.stale_handle = False
+
+    def write(self, data):
+        if self.stale_handle:
+            raise HIDTransportError("USB HID handle no longer works")
+        super().write(data)
 
 
 def wait_for(predicate, timeout=4):
@@ -98,6 +116,67 @@ class SessionTests(unittest.TestCase):
             self.service.session.submit("pause").result(2)
         self.assertEqual(self.service.session.snapshot().failures, 1)
         self.assertIsNone(self.service.session.snapshot().last_error)
+
+    def test_start_after_stop_reopens_stale_hid_once_and_keeps_csv(self):
+        transport = RepluggedTransport()
+        sensor = HDC3020Sensor(transport)
+        with tempfile.TemporaryDirectory() as directory:
+            self.service.start(sensor, auto_record=True, recording_directory=Path(directory))
+            wait_for(lambda: len(self.service.snapshot()) >= 1)
+            path = self.service.recorder.status().path
+            self.service.session.submit("pause").result(2)
+            previous_count = len(self.service.snapshot())
+            transport.stale_handle = True  # USB cable replugged while Stop kept the old handle.
+            self.service.start(
+                create_sensor("simulation"), auto_record=True, recording_directory=Path(directory)
+            )
+            wait_for(lambda: len(self.service.snapshot()) > previous_count)
+            state = self.service.session.snapshot()
+            self.assertEqual(state.connection, "connected")
+            self.assertEqual(state.failures, 1)
+            self.assertEqual(transport.open_count, 2)
+            self.assertEqual(self.service.recorder.status().path, path)
+            self.service.session.disconnect(wait=True)
+            with path.open(newline="", encoding="utf-8") as stream:
+                rows = list(csv.DictReader(stream))
+            self.assertEqual(len(rows), len(self.service.snapshot()))
+
+    def test_hid_loss_during_established_run_fails_after_one_write(self):
+        transport = RepluggedTransport()
+        self.service.start(HDC3020Sensor(transport))
+        wait_for(lambda: len(self.service.snapshot()) >= 1)
+        transport.stale_handle = True
+        wait_for(lambda: self.service.session.snapshot().connection == "error")
+        state = self.service.session.snapshot()
+        self.assertEqual(state.failures, 1)
+        self.assertNotIn("3 consecutive", state.last_error)
+        self.assertEqual(transport.open_count, 1)
+
+    def test_reopen_restores_previous_auto_mode(self):
+        transport = RepluggedTransport()
+        self.service.session.connect(HDC3020Sensor(transport))
+        wait_for(lambda: self.service.session.snapshot().connection == "connected")
+        self.service.session.submit("configure", mode="auto_1hz", low_power=2).result(2)
+        transport.stale_handle = True
+        self.service.start(create_sensor("simulation"))
+        wait_for(lambda: transport.open_count == 2)
+        state = self.service.session.snapshot()
+        self.assertEqual(state.connection, "connected")
+        self.assertEqual((state.mode, state.low_power), ("auto_1hz", 2))
+
+    def test_stale_hid_during_heater_pulse_does_not_auto_reopen(self):
+        transport = RepluggedTransport()
+        self.service.session.connect(HDC3020Sensor(transport))
+        wait_for(lambda: self.service.session.snapshot().connection == "connected")
+        self.service.session.submit("heater_pulse").result(2)
+        self.service.session._heater_deadline = time.monotonic() + 60
+        transport.stale_handle = True
+        self.service.start(create_sensor("simulation"))
+        wait_for(lambda: self.service.session.snapshot().connection == "error")
+        state = self.service.session.snapshot()
+        self.assertEqual(transport.open_count, 1)
+        self.assertTrue(state.heater_on)
+        self.assertIn("shutdown state is uncertain", state.last_error)
 
     def test_invalid_config_does_not_disconnect_but_io_failure_does(self):
         self.connect()

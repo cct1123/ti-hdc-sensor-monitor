@@ -155,3 +155,15 @@ the user confirmed that entering serial `87F2A26E08002500` connects and both
 USB2ANY bridges are currently attached. Diagnose and improve bridge-selection
 and timeout feedback under REQ-001. The report does not authorize a new physical
 candidate or another heater pulse; retain the H016 hardware review gate.
+
+## H020 - Reconnect after stopped monitoring fails intermittently (2026-09-25, user in this task)
+
+The user reported that after stopping measurement, disconnecting and
+reconnecting the device, Start monitoring may show errors and only resume
+after several attempts. The supplied screenshot shows `USB HID wrote -1 bytes;
+expected 64` during three consecutive measurements, followed by the same
+write failure during both shutdown commands. Whether the user clicked the
+dashboard's Disconnect control, unplugged USB, or both is pending clarification.
+Diagnose the lifecycle and improve REQ-001/006 recovery and error reporting.
+This report does not approve real-device testing of a changed candidate or
+another heater pulse; retain the hardware review gate.

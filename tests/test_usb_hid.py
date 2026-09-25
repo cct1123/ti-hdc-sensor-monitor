@@ -3,7 +3,7 @@ import types
 import unittest
 from unittest.mock import Mock, patch
 
-from hdcsensor.errors import SensorError
+from hdcsensor.errors import HIDTransportError, SensorError
 from hdcsensor.usb_hid import USB2ANYHIDTransport, _crc8
 
 
@@ -37,6 +37,9 @@ class FakeHID:
 
     def close(self):
         self.closed = True
+
+    def error(self):
+        return "The device is not connected"
 
 
 class HIDTests(unittest.TestCase):
@@ -100,6 +103,14 @@ class HIDTests(unittest.TestCase):
         self.device.pending.append(reply(3, 2, kind=3, status=207))
         with self.assertRaisesRegex(SensorError, "serial TEST command 0x02: I2C write timed out \\(-49\\)"):
             self.transport.write(b"\x37\x81")
+
+    def test_negative_hid_write_is_a_lost_handle(self):
+        self.transport.open()
+        with (
+            patch.object(self.device, "write", return_value=-1),
+            self.assertRaisesRegex(HIDTransportError, "serial TEST: wrote -1 of 64 bytes.*not connected"),
+        ):
+            self.transport.write(b"\x24\x00")
 
     def test_truncated_corrupt_and_short_responses(self):
         self.transport.open()

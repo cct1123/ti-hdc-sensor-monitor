@@ -634,3 +634,43 @@ published baseline. A scan of added lines found no credential markers,
 personal paths or email addresses. The retry was approved and fast-forwarded
 `origin/main` to `19fd5f2`; independent `git ls-remote` returned the full SHA
 above. This publication is not physical-candidate approval.
+
+## E042 - H020 stale HID handle diagnosis and software regression (2026-09-25)
+
+The user's screenshot shows `hid_write=-1` three times during measurement,
+then once for each shutdown command after stopped monitoring and a reported
+device disconnect/reconnect (H020). [HIDAPI's hid_write contract](https://github.com/libusb/hidapi/blob/master/hidapi/hidapi.h)
+defines `-1` as a write error and recommends reading its native error text;
+that value alone does not prove whether the cause was an unplug, OS handle
+invalidation, contention or another transport failure. Source inspection shows
+**Stop** pauses sampling while retaining the HID handle. A physical USB replug
+while paused can invalidate it; the old worker's first resumed sample then
+reuses that handle. The user's exact GUI Disconnect versus cable sequence is
+not yet confirmed. This is a supported failure path, not a proven reconstruction
+of the specific physical event.
+
+## D005 - Bounded HID recovery on explicit Start/Resume
+
+Classify failed HID writes and HID I/O exceptions separately from sensor CRC
+errors. After the first HID failure on the first attempted sample following
+Start/Resume, allow one reopen of the selected bridge on the same worker only
+when no heater pulse is active. Close the failed handle, read and compare the
+USB serial/NIST ID/address before volatile writes, restore heater-off and the
+prior measurement mode, and continue the same CSV recording. A later HID
+failure stops immediately; there is no background reconnect loop or retry of
+an uncertain control write. Preserve shutdown attempts and identify both
+commands separately in errors. A changed identity or uncertain heater state
+fails closed. This limits duplicate measurements and avoids silently attaching
+to another board.
+
+TEST-001/002/003/004 software suite: `uv run --locked --extra usb --extra dev
+python -m unittest discover -s tests -v` passed 50/50. Fake HID confirms
+negative writes raise a transport error with native detail. Simulated session
+tests cover Stop/replug/Start reopen and CSV continuity, one-write failure
+after an established run, auto-mode restoration, identity mismatch before
+volatile writes, and heater-active refusal. Ruff check and format check passed
+for 38 Python files; `git diff --check` passed. No real HID enumeration, read
+or write was performed in H020. The revised 38-file normalized candidate
+manifest is `outputs/auto-record-candidate-manifest.json`, SHA256
+`550ce489168e64a03720c953add6d3ddbb671547ff103105d42d2b68200a88bc`.
+Physical reconnect and auto-CSV behavior remain UNTESTED pending review.

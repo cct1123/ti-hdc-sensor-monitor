@@ -11,7 +11,7 @@ from __future__ import annotations
 import time
 from typing import Optional
 
-from .errors import SensorError
+from .errors import HIDTransportError, SensorError
 
 VENDOR_ID = 0x2047
 PRODUCT_ID = 0x0301
@@ -115,7 +115,18 @@ class USB2ANYHIDTransport:
         try:
             written = self._device.write(report)
             if written != REPORT_SIZE:
-                raise SensorError(f"USB HID wrote {written} bytes; expected {REPORT_SIZE}")
+                detail = ""
+                if written < 0:
+                    try:
+                        native_error = self._device.error()
+                    except Exception:
+                        native_error = None
+                    if native_error and str(native_error).lower() != "success":
+                        detail = f" ({native_error})"
+                raise HIDTransportError(
+                    f"USB HID write failed on serial {self.serial_number or '<unavailable>'}: "
+                    f"wrote {written} of {REPORT_SIZE} bytes{detail}; reopen the device"
+                )
             deadline = time.monotonic() + self.timeout_s
             while True:
                 remaining = deadline - time.monotonic()
@@ -151,7 +162,7 @@ class USB2ANYHIDTransport:
                     raise SensorError("Unexpected USB2ANY reply type, flags, or status")
                 return reply[8:]
         except OSError as exc:
-            raise SensorError(f"USB HID communication failed: {exc}") from exc
+            raise HIDTransportError(f"USB HID communication failed: {exc}; reopen the device") from exc
 
     def configure_i2c(self, frequency_hz: int) -> None:
         if frequency_hz not in (100000, 400000):

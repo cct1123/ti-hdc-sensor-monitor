@@ -31,6 +31,16 @@ Software regression tests cover the new error paths (E040); no connected-board
 check of this revised source has run. The reported `-49` means an I²C write
 timeout; without a fresh enumeration from that failed session, its selected
 bridge and precise bus cause remain unknown.
+H020 reports a later `hid_write=-1` after stopped monitoring and a device
+disconnect/reconnect; the screenshot shows three failed measurements and two
+failed shutdown writes. HIDAPI defines `-1` as a write failure, without proving
+the physical cause. **Stop** leaves the HID handle open, so a USB replug while
+paused can leave a stale handle. The revised worker makes one reopen attempt
+only after the first HID failure following Start/Resume, verifies the same
+USB/NIST identity before volatile writes, restores measurement mode, and keeps
+the CSV file open. Later HID failures stop immediately. No automatic reopen
+occurs during a heater pulse. Software tests cover these paths (E042); the
+user's exact Disconnect-button versus cable sequence remains unconfirmed.
 The previous H007/H010 physical results do not validate the new auto-save path.
 
 First validated device: one Texas Instruments USB2ANY/OneDemo HID bridge, VID:PID

@@ -5,6 +5,10 @@ class SensorError(RuntimeError):
     """Hardware communication or device validation failed."""
 
 
+class HIDTransportError(SensorError):
+    """The open USB HID handle failed and must be reopened."""
+
+
 class CRCError(SensorError):
     """Sensor response failed its CRC check."""
 

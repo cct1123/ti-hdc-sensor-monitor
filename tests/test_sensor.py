@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from hdcsensor.errors import SensorError
 from hdcsensor.protocol import Command, encode_word
@@ -55,6 +55,27 @@ class SensorTests(unittest.TestCase):
             sensor.open()
         transport.close.assert_called_once()
         transport.write.assert_called_once_with(b"\x37\x81")
+
+    def test_reopen_rejects_changed_identity_before_volatile_writes(self):
+        identity = self.sensor.identity
+        self.sensor.close()
+        self.transport.write.reset_mock()
+        original_read = self.transport.read
+
+        def changed_nist(count):
+            if self.transport.pending == Command.NIST_LOW:
+                return encode_word(0)
+            return original_read(count)
+
+        with (
+            patch.object(self.transport, "read", side_effect=changed_nist),
+            self.assertRaisesRegex(SensorError, "identity changed"),
+        ):
+            self.sensor.open(expected_identity=identity)
+        self.assertFalse(self.transport.opened)
+        commands = [call.args[0][:2] for call in self.transport.write.call_args_list]
+        self.assertNotIn(Command.HEATER_OFF.to_bytes(2, "big"), commands)
+        self.assertNotIn(Command.EXIT_AUTO.to_bytes(2, "big"), commands)
 
     def test_cleanup_attempts_both_commands_and_releases_even_on_error(self):
         self.transport.write.side_effect = OSError("unplugged")
