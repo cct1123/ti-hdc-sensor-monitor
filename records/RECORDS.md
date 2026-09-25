@@ -591,3 +591,31 @@ identity/readings plus repo-local paths in the new reports. The same
 `git push origin main` was then approved and fast-forwarded to `b0cb8a2`.
 Independent `git ls-remote origin refs/heads/main` returned the full commit
 SHA above. Publication is not H016 physical candidate approval.
+
+## E040 - H019 blank-serial timeout diagnosis and software regression (2026-09-25)
+
+The user reported `USB2ANY command 0x02: device error -49` after a blank USB
+serial and confirmed that explicit serial `87F2A26E08002500` connects while
+two USB2ANY bridges are attached (H019). TI's [USB2ANY SDK API reference](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/196/0116.API-Reference-for-USB2ANY-SDK-2.8.pdf)
+defines `-49` as I²C write timeout. Current transport logic rejects a blank
+serial when HID enumeration returns multiple bridges, before opening or
+writing to either. Therefore the exact reported failure cannot follow from a
+two-bridge enumeration in this source. The bridge enumerated at the time of
+the failed session and the physical bus cause were not captured; neither is
+inferred from the user's report.
+
+Updated REQ-001 diagnostics: ambiguity now lists the enumerated USB serials,
+an explicitly requested but absent serial has a distinct message, and a
+bridge error names its selected serial. `-49` is identified as an I²C write
+timeout with a check of bridge and sensor bus. The GUI placeholder and usage
+guide explain that blank serial does not identify the HDC3020 among bridges.
+TEST-001/002/003/004 software suite: `uv run --locked --extra usb --extra dev
+python -m unittest discover -s tests -v` passed 44/44, including fake-HID tests
+showing that blank serial with two bridges opens neither and that `-49` names
+the selected bridge. Ruff check and format check passed (38 Python files).
+The updated 38-file normalized H016/H019 candidate manifest is
+`outputs/auto-record-candidate-manifest.json`, SHA256
+`687e3411857ce9655a807dfcda50e40388592fa506ff110ca9e6327fdcfae7af`;
+all listed file hashes and the candidate digest were independently recomputed.
+No real HID enumeration or physical command was run under H019; H016's revised
+candidate still requires review before a physical test.

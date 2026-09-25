@@ -85,6 +85,22 @@ class HIDTests(unittest.TestCase):
         self.transport.open()
         self.assertEqual(self.device.path, b"b")
 
+    def test_blank_serial_lists_bridges_without_opening_either(self):
+        self.hid.enumerate.return_value = [
+            {"path": b"a", "serial_number": "47F3A26E27001D00"},
+            {"path": b"b", "serial_number": "87F2A26E08002500"},
+        ]
+        with self.assertRaisesRegex(SensorError, "47F3A26E27001D00.*87F2A26E08002500"):
+            self.transport.open()
+        self.hid.device.assert_not_called()
+        self.assertEqual(self.device.writes, [])
+
+    def test_i2c_write_timeout_identifies_selected_bridge(self):
+        self.transport.open()
+        self.device.pending.append(reply(3, 2, kind=3, status=207))
+        with self.assertRaisesRegex(SensorError, "serial TEST command 0x02: I2C write timed out \\(-49\\)"):
+            self.transport.write(b"\x37\x81")
+
     def test_truncated_corrupt_and_short_responses(self):
         self.transport.open()
         for response, message in (

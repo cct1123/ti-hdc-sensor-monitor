@@ -1,7 +1,7 @@
 {
-  "candidate_sha256": "df446d86b47c266b8e0a554411e5a9bca112178700217719707094c444aaee97",
+  "candidate_sha256": "687e3411857ce9655a807dfcda50e40388592fa506ff110ca9e6327fdcfae7af",
   "base_validation_sha256": "9111c1713dbe667c652141ecd7226ca79967314220731685a2819c27d7b2620a",
-  "created_utc": "2026-09-25T15:32:25.428670+00:00",
+  "created_utc": "2026-09-25T16:35:39.929481+00:00",
   "python": "3.12.13",
   "packages": {
     "dash": "3.4.0",
@@ -16,12 +16,12 @@
     "NOTICE.md": "b1d93daf42de3bee32e5912e745d1aedc92aedf5821131517d86bd6964e26450",
     "PROJECT.md": "cb03281576241049531e47b6073bb8bd7cfe15471bf93cdde3a71956657aa62a",
     "README.md": "bd59639ced0b6d82e6cf1ad955eeea8bc2edf99393eb21d17a7f1c2fdd229b8a",
-    "app.py": "652d1ae153d50947bc02d7af5f19139893c781e7155e9483fac3a69c07796b12",
+    "app.py": "14ae2c2f7ec3a01f5f5a6f6285d9d8dccb4ebddc8e5645862361d16bb6ceb1b3",
     "assets/styles.css": "18bc107baef25308dfadccb9d1abb0e129a0a0d378649ec081e13a75a983c8c0",
     "docs/hardware-validation.md": "fe0bb58bf7cdd4a6b8cad2a783cc34b9250d4cd2450fc4f1c4c759caf9b88644",
-    "docs/protocol.md": "d0e5eeba6e52cc4ac66d55641ceb5aa4cf418b0c8d0e672671479ea70b8a67be",
+    "docs/protocol.md": "e0bd5688d743b3aecaba0fb82a3f135eb70c5fec816ea23e7602e000d8ce8dd9",
     "docs/quick-start.md": "646726c08bd0225876647517b59261a92ffdf65a4e87cce85e903651d990148a",
-    "docs/usage-guide.md": "9f4eb68f837dd4d9465200edb5354edac77ce1dce6aefb228ceb30c5e59df088",
+    "docs/usage-guide.md": "93033c8ead19bc615be4e1197192b222d0f38c17ae45f9cb1d022d9a93aaf3f4",
     "hdcsensor/__init__.py": "746f72d7f8fa9c6d88d38063800757a083c28fb97f4791d32af5f82ccb9233e2",
     "hdcsensor/acquisition.py": "42e820c781491ebc3d2b78a5c2d5cea4698e55bba3548ab6b749a56fae0fba2d",
     "hdcsensor/device_session.py": "f33b809d79664709d3dde9449f6a74bcfc894af59e34c58e44029b85bb6167e5",
@@ -34,7 +34,7 @@
     "hdcsensor/ui/__init__.py": "b7c069832e95c4b9d17f6b033219a53a74b9b374054c0b6bb2a3939b47b62155",
     "hdcsensor/ui/monitor.py": "e09af879713adef8add827106b0fb3e7b5e35a87303c38f05cca0a751826ec4f",
     "hdcsensor/ui/settings.py": "8451b682950df07aab0b18f218d258aa57dd9fd7e48111c353f984a7f0854bdf",
-    "hdcsensor/usb_hid.py": "8a1491c0f356b745f1f32ed60c225bee6f004562e97390652f69455e5211a02c",
+    "hdcsensor/usb_hid.py": "8b682a6e3a17257b3fc05575cdf505347a7e85d8f2860ec787df94da898eb711",
     "hdcsensor/validate.py": "d37f4a0541d324da2cfe97a9fd51e672822ed5caa106c2873e44331209ca581c",
     "hdcsensor/validate_controls.py": "14b6e1f6fd0fbb343c63643c29bb26754f3b3ce96a02b18b831c8473847e20a1",
     "hdcsensor/validate_dashboard.py": "3a98d04074e9df1c285aeedda7e5a464e1f9ce1da6674622435f076299c977a0",
@@ -46,7 +46,7 @@
     "tests/test_sensor.py": "0f07d086a55ac084ef6981daa2c343e9a7c6969ad88b7810027f61c3e58b7243",
     "tests/test_session.py": "f992ff721f1e103217f2281f44ca4af0216a36b554f0caa3302606c6b1f5d342",
     "tests/test_simulation.py": "4dae8e9f6c002c151704cd45bf66ddae0d05ee804d9336528b3b3a5ff16a6e07",
-    "tests/test_usb_hid.py": "0a94b1a49b5446086d51d530ee57e05d10b1aed64c0da9cc32c4a42e21a8944b",
+    "tests/test_usb_hid.py": "8c17b72b415d817b4b75d1d80fc7afba357980034ff347461fe3b532d844ac7b",
     "uv.lock": "530b0db34ac82864b5721523786908238e58bd1a7520aced8f0bdf6f6e998542"
   },
   "hashing": "File SHA-256: bytes with CRLF replaced by LF. Candidate SHA-256: UTF-8 JSON of files, sort_keys=True, separators=(',', ':')."

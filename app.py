@@ -144,7 +144,7 @@ def layout(simulation=False):
                                 dcc.Input(
                                     id="serial",
                                     type="text",
-                                    placeholder="Required if several EVMs are connected",
+                                    placeholder="Required with 2+ USB2ANY bridges",
                                     value="",
                                 ),
                             ),

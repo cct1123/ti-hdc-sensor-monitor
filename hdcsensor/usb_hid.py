@@ -72,10 +72,17 @@ class USB2ANYHIDTransport:
             if self.serial_number is not None:
                 devices = [d for d in devices if d.get("serial_number") == self.serial_number]
             if not devices:
-                raise SensorError("No USB2ANY/OneDemo EVM was found; check the USB connection")
+                if self.serial_number is not None:
+                    raise SensorError(
+                        f"USB2ANY bridge serial {self.serial_number} was not found; "
+                        "check the USB connection and serial number"
+                    )
+                raise SensorError("No USB2ANY/OneDemo bridge was found; check the USB connection")
             if len(devices) != 1:
+                serials = ", ".join(str(device.get("serial_number") or "<unavailable>") for device in devices)
                 raise SensorError(
-                    "Multiple USB2ANY EVMs found; connect one board or specify its serial number"
+                    f"Multiple USB2ANY bridges found ({serials}); "
+                    "enter the HDC3020EVM USB serial or connect only that board"
                 )
             self._device = hid.device()
             self._device.open_path(devices[0]["path"])
@@ -133,9 +140,13 @@ class USB2ANYHIDTransport:
                     code = reply[6] - 256
                     detail = {
                         -44: "I2C address was not acknowledged",
+                        -49: "I2C write timed out (-49); verify the selected bridge and sensor bus",
                         -54: "bridge I2C pullups require 3.3 V EXT power",
                     }.get(code, f"device error {code}")
-                    raise SensorError(f"USB2ANY command 0x{command:02X}: {detail}")
+                    raise SensorError(
+                        f"USB2ANY serial {self.serial_number or '<unavailable>'} "
+                        f"command 0x{command:02X}: {detail}"
+                    )
                 if reply[3] != 2 or reply[4] != 0 or reply[6] != 0:
                     raise SensorError("Unexpected USB2ANY reply type, flags, or status")
                 return reply[8:]

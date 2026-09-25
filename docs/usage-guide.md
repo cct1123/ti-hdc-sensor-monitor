@@ -154,8 +154,9 @@ test. If cleanup fails, resolve the error and unplug the EVM when shutdown is un
 
 | Symptom | Next step |
 | --- | --- |
-| No USB2ANY/OneDemo EVM found | Check USB and close TI's GUI. Confirm board/firmware assumptions in the [protocol notes](protocol.md); do not flash firmware as a shortcut. |
-| Multiple compatible boards found | Connect one board or enter its USB serial before connecting. |
+| No USB2ANY/OneDemo bridge found | Check USB and close TI's GUI. Confirm board/firmware assumptions in the [protocol notes](protocol.md); do not flash firmware as a shortcut. |
+| Multiple USB2ANY bridges found | Enter the HDC3020EVM's USB serial from the listed bridges, or connect only that board. A blank serial selects a bridge only when exactly one is enumerated; it does not identify the sensor automatically. |
+| USB2ANY I²C write timeout `-49` | The selected bridge reported a timeout during a raw I²C write. Read the USB serial in the error, confirm it is the HDC3020EVM, check address/connection and close TI's GUI, then reconnect. With two attached bridges, enter the known EVM serial instead of leaving it blank. |
 | Missing HID dependency | Start with `uv run --extra usb python app.py` so uv includes the USB dependency. |
 | USB2ANY error -54 | The bridge's internal I²C pullups need its separate 3.3 V EXT output. The stock EVM already has on-board pullups, so this app disables bridge pullups (E012/D003). Verify this is a stock board and use the current code. |
 | CRC, NAK or failed reads | Check connection, address and device ownership. Three consecutive failures close the session; reconnect after resolving the cause. |

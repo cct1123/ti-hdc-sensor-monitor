@@ -1,9 +1,9 @@
 # Current checkpoint
 
-Phase: **AWAITING_HUMAN_REVIEW** (H016 automatic daily CSV candidate)
-Checkpoint: 2026-09-25 10:37 America/Chicago, H018 publication verified
-Last applied human input: H018
-Owner: released at 2026-09-25 10:37 America/Chicago.
+Phase: **AWAITING_HUMAN_REVIEW** (H016/H019 revised candidate)
+Checkpoint: 2026-09-25 11:35 America/Chicago, H019 software review complete
+Last applied human input: H019
+Owner: released at 2026-09-25 11:35 America/Chicago.
 Staleness window 24 h, after checking task liveness.
 
 ## Current result
@@ -30,12 +30,12 @@ pulse was issued, then status-off and clean close were verified (E033).
 
 | Requirement | Current status and method |
 | --- | --- |
-| REQ-001 USB/raw I2C | PASS: new board identity/CRC/firmware and clean reopen/close (E028/E029, TEST-005) |
+| REQ-001 USB/raw I2C | Explicit-serial physical path PASS on previous runtime (E028/E029, TEST-005); H019 ambiguity and timeout diagnostics PASS in fake-HID tests (E040), revised physical path UNTESTED pending review |
 | REQ-002 paired conversion/cadence | PASS: 30 new-board physical pairs, 0.999964 s median, zero failed reads; raw conversion/CRC software tests (E027/E029, TEST-001/002/005) |
 | REQ-003 live values/stats/history | PASS: real Dash callbacks and browser show paired values/aligned plots and follow behavior (E030/E031, TEST-004/005) |
-| REQ-004 CSV/log/export | PASS in 42-test software suite and simulator browser for H016 auto-start, UTC rollover, opt-out and disconnect (E035/E038, TEST-003/004); physical auto path UNTESTED pending candidate review (E036) |
+| REQ-004 CSV/log/export | PASS in 44-test software suite and prior simulator browser for H016 auto-start, UTC rollover, opt-out and disconnect (E035/E040, TEST-003/004); physical auto path UNTESTED pending candidate review (E036) |
 | REQ-005 volatile controls/identity | PASS: all 12 mode/LPM combinations and status clear/reset on the earlier board (E014/E017); new-board identity, auto 1 Hz/LPM1 and one approved integrated-heater pulse/status-off/cooldown (E028/E030/E032/E033, TEST-006) |
-| REQ-006 single worker/errors/tests | PASS in 42-test software suite, including new lifecycle/error cases (E035/E038); physical integration of changed session callbacks UNTESTED pending candidate review (E036) |
+| REQ-006 single worker/errors/tests | PASS in 44-test software suite, including H019 bridge errors (E040); physical integration of changed session callbacks UNTESTED pending candidate review (E036) |
 
 Physical TEST-005 report/CSV:
 outputs/hardware-validation/validation_20260923_200902_021356.json and paired
@@ -65,17 +65,19 @@ The H010 reviewed source, documentation and evidence commit is
 The earlier `6514201` baseline was fast-forwarded. H016 has since changed
 runtime recording, session callbacks and UI; its 38-file normalized review
 snapshot is `outputs/auto-record-candidate-manifest.json`, SHA256
-`df446d86b47c266b8e0a554411e5a9bca112178700217719707094c444aaee97`
-(E038). H017 removed the sample-interval helper note without changing the
+`687e3411857ce9655a807dfcda50e40388592fa506ff110ca9e6327fdcfae7af`
+(E040; supersedes E038's digest). H017 removed the sample-interval helper note without changing the
 configured interval or buffer. H018 updated the guides and pruned three stale
 simulator screenshots; commit `b0cb8a2cf290029d5c225d6272be3f0a021a7847`
 was pushed to `origin/main` and independently verified (E039). The prior
 physical E029–E033 results apply to the older runtime, not the new auto-save
-path.
+path. H019 improved USB selection/timeout feedback, with 44 software tests
+passing. The user's explicit serial works by report; the bridge enumerated
+during the blank-serial failure is unknown (E040).
 
 ## Human action required
 
-Review the H016 candidate manifest and report, then explicitly approve the
+Review the revised H016/H019 candidate manifest and report, then explicitly approve the
 bounded non-heater automatic-CSV check on the already identified HDC3020EVM,
 USB serial `87F2A26E08002500`, address 0x44. E035 shows software and simulator
 PASS; E036 records the new source boundary. All useful hardware-independent
@@ -87,7 +89,13 @@ No heater pulse is requested; H015's single pulse is complete.
 
 ## Loop continuity
 
-In-flight operation: none. The H018 source and evidence commit was published
+In-flight operation: none. H019 reports `-49` on blank serial while two
+bridges are attached and explicit serial succeeds. Under current code, two
+enumerated bridges produce an ambiguity error before I2C. The observed HID
+enumeration during that failure is unknown; E040 records the software repair
+and passing fake-HID tests. No real-device interaction is authorized for the
+revised candidate.
+The H018 source and evidence commit was published
 and remote `refs/heads/main` verified equal to
 `b0cb8a2cf290029d5c225d6272be3f0a021a7847` (E039). H016 implementation
 and independent validation are complete (E035/E036/E038). Stay at the review

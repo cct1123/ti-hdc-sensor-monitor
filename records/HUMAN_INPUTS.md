@@ -146,3 +146,12 @@ preserved physical evidence, remove only confirmed obsolete material, and
 commit/push the reviewed source and evidence to the existing repository.
 This is publication authority, not approval to operate the revised candidate
 with hardware. Keep the H016 physical review gate pending.
+
+## H019 - Blank USB serial connection failure (2026-09-25, user in this task)
+
+The user reported that leaving USB serial blank led to `USB2ANY command 0x02:
+device error -49` and a failed session. In response to a focused question,
+the user confirmed that entering serial `87F2A26E08002500` connects and both
+USB2ANY bridges are currently attached. Diagnose and improve bridge-selection
+and timeout feedback under REQ-001. The report does not authorize a new physical
+candidate or another heater pulse; retain the H016 hardware review gate.

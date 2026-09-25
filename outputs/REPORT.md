@@ -23,6 +23,14 @@ tested below. The original manifest remains the review-gate record. The H010
 source/configuration snapshot is in [validation-manifest.json](validation-manifest.json).
 H016 changes runtime recording and session lifecycle; its distinct reviewed
 snapshot is [auto-record-candidate-manifest.json](auto-record-candidate-manifest.json).
+H019 adds bridge-selection and I²C timeout diagnostics after a user-reported
+blank-serial connection failure. With two enumerated USB2ANY bridges, blank
+serial is rejected before opening either; it does not search for an HDC3020.
+The user reports that explicitly selecting `87F2A26E08002500` succeeds.
+Software regression tests cover the new error paths (E040); no connected-board
+check of this revised source has run. The reported `-49` means an I²C write
+timeout; without a fresh enumeration from that failed session, its selected
+bridge and precise bus cause remain unknown.
 The previous H007/H010 physical results do not validate the new auto-save path.
 
 First validated device: one Texas Instruments USB2ANY/OneDemo HID bridge, VID:PID

@@ -75,3 +75,7 @@ Manufacturer `3781` returns `3000` with CRC. NIST serial is three CRC-protected
 words read with `3683`, `3684`, `3685`, joined MSB first into a 48-bit hex string.
 Manufacturer identity alone does not uniquely prove the HDC3020 model; matching
 hardware, NIST responses and actual measurements remain part of physical validation.
+
+USB2ANY `-49` means an I²C write timeout in [TI's USB2ANY SDK API reference](https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/196/0116.API-Reference-for-USB2ANY-SDK-2.8.pdf).
+With no USB serial, the transport selects a bridge only when HID enumeration
+returns exactly one. It cannot infer which connected bridge carries an HDC3020.
