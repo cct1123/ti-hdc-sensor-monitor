@@ -1,9 +1,40 @@
 # Physical validation procedure and results
 
 Under H007, TEST-005 and the non-heater portion of TEST-006 were run on one
-connected HDC3020EVM on 2026-09-23. See E012–E019 and outputs/REPORT.md for
-results. The procedures below remain reproducible; sensor calibration and
-heater-on behavior are not established by those results.
+connected HDC3020EVM on 2026-09-23. H011/H012 repeated core monitoring on a
+second board, and H015 authorized one bounded physical check of the sensor's
+optional integrated heater on that board (E028–E033). See outputs/REPORT.md.
+The procedures remain reproducible; independent sensor accuracy calibration
+has not been performed.
+
+## H016 automatic-recording candidate (pending review)
+
+The H016 change has software and simulator evidence only (E035). Before using
+the revised source with the EVM, review its candidate manifest, current report,
+and the following non-heater TEST-005 procedure. H007 approved an earlier
+candidate; H015's one heater pulse was consumed. Do not repeat the heater test.
+
+With explicit approval for this candidate and the identified board, close TI's
+GUI and any other process holding USB2ANY. Select USB serial
+`87F2A26E08002500`, address 0x44, 1 s interval, and leave the checked **Save CSV
+automatically while monitoring** option enabled. First identify the bridge,
+manufacturer 0x3000, CRC-valid NIST ID `1BADE0120F3E`, and heater-off status;
+stop if any differ. Start monitoring, accept at least five paired samples, and
+verify that the CSV begins only after connection, has the same paired values and
+UTC timestamps as the buffer, and shows zero dropped rows. Pause with **Stop**,
+verify the writer remains active, then resume and confirm it uses the same file.
+Disconnect and verify the writer drains/closes, **Download last CSV** becomes
+available, and the row count matches the accepted buffer. Repeat one short
+non-heater run with auto-save unchecked to verify no automatic file is made;
+manual **Record** must still work. The UTC boundary is covered by the
+deterministic software TEST-003; no physical midnight wait is required.
+
+If identity, paired acquisition, CSV agreement, cleanup, or error reporting
+fails, stop and preserve the exact report/CSV/UI error. On clean shutdown the
+worker attempts heater-off, exit-auto, and HID close. If device status becomes
+uncertain, unplug the EVM. No heater-on, persistent configuration, firmware,
+EEPROM, offset, threshold, general-call reset, or board-power action is within
+this recording check.
 
 ## First authorized interaction (TEST-005)
 
@@ -58,14 +89,22 @@ Heater testing requires separate explicit inclusion in approval: minimum element
 to heat. Confirm status bit 13 rises and clears, CSV flag/plot marker appear, and
 the sensor returns toward ambient after cooldown. The software cannot certify an
 environment-specific thermal limit. Skip this test unless the setup permits heating.
-After that separate approval, run `uv run --extra usb python -m hdcsensor.validate_heater
---hardware --confirm-attended --output outputs/hardware-validation`. This bounded runner was
-rehearsed only in simulation (E020); its report preserves actual temperatures,
-RH and status/CSV checks. Do not interpret cooldown values as calibrated accuracy.
+Under H015, the bounded runner was invoked once with `uv run --locked --extra usb
+python -m hdcsensor.validate_heater --hardware --confirm-attended --serial
+87F2A26E08002500 --output outputs/hardware-validation`. It was first rehearsed
+in simulation (E020); its physical report preserves actual temperatures, RH and
+status/CSV checks. Do not interpret cooldown values as calibrated accuracy.
+
+Actual H015 TEST-006 result: PASS on serial `87F2A26E08002500`, with one
+minimum-element pulse lasting 5.047 s, status-on/off, 13 paired samples, two
+heater-on CSV rows, final off status, zero failed reads/recording loss and clean
+disconnect (E032/E033). This is one attended validation, not blanket permission
+for heating in other physical setups.
 
 ## Stop and recovery
 
-Use Stop recording, then Disconnect. Cleanup attempts heater-off, exit-auto, HID close.
+Use Disconnect to drain an active recording and release the board. Cleanup
+attempts heater-off, exit-auto, HID close.
 Terminate the app gracefully with Ctrl+C. If shutdown status is uncertain or the
 process/USB path fails, physically unplug the EVM. Reconnect establishes defaults
 again; no persistent sensor memory was intentionally changed. Preserve failed

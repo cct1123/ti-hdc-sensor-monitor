@@ -3,9 +3,11 @@
 import threading
 from collections import deque
 from datetime import datetime, timezone
+from pathlib import Path
 
 from .device_session import DeviceSession
 from .models import Sample
+from .protocol import validate_interval
 from .recording import CsvRecorder
 
 
@@ -16,8 +18,20 @@ class AcquisitionService:
         self._lock = threading.RLock()
         self._samples = deque(maxlen=max_samples)
         self._sequence = 0
+        self._auto_record = False
+        self._recording_directory = Path("recordings")
         self.recorder = CsvRecorder(queue_size=recorder_queue_size)
-        self.session = DeviceSession(self._accept_sample)
+        self.session = DeviceSession(
+            self._accept_sample,
+            on_connected=self._on_connected,
+            on_disconnected=self.recorder.stop,
+        )
+
+    def _on_connected(self, sampling):
+        with self._lock:
+            auto_record, directory = self._auto_record, self._recording_directory
+        if sampling and auto_record and not self.recorder.status().recording:
+            self.recorder.start(directory, rotate_daily=True)
 
     def _accept_sample(self, reading, source, mode, low_power):
         with self._lock:
@@ -45,8 +59,13 @@ class AcquisitionService:
         with self._lock:
             self._samples.clear()
 
-    def start(self, sensor, interval_s=1.0):
+    def start(self, sensor, interval_s=1.0, auto_record=False, recording_directory=Path("recordings")):
+        interval_s = validate_interval(interval_s)
+        with self._lock:
+            self._auto_record = bool(auto_record)
+            self._recording_directory = Path(recording_directory)
         if self.session.snapshot().connection == "connected":
+            self._on_connected(sampling=True)
             return self.session.submit("resume", interval_s=interval_s)
         self.session.connect(sensor, interval_s, sampling=True)
 

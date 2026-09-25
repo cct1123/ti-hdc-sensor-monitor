@@ -48,6 +48,7 @@ def validate_dashboard(hardware=False, serial=None, output=Path("recordings")):
             "address.value": "0x44",
             "serial.value": serial or "",
             "sample-interval.value": 1,
+            "auto-record.value": ["enabled"],
             "measurement-mode.value": "on_demand",
             "low-power.value": 0,
         }

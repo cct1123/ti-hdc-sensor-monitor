@@ -1,0 +1,39 @@
+{
+  "backend": "usb_hid",
+  "physical_validation": true,
+  "passed": true,
+  "started_utc": "2026-09-24T21:19:39.857607+00:00",
+  "checks": {
+    "initial_heater_off": true,
+    "heater_status_on": true,
+    "heater_still_on_when_paused": true,
+    "automatic_heater_off": true,
+    "pulse_duration": true,
+    "final_heater_status_off": true,
+    "heater_affected_pairs": true,
+    "plot_heater_markers": true,
+    "csv_heater_flags": true,
+    "no_recording_loss": true,
+    "no_read_failures": true,
+    "clean_disconnect": true
+  },
+  "errors": [],
+  "identity": {
+    "source": "HDC3020EVM USB HID at 0x44",
+    "serial_number": "87F2A26E08002500",
+    "firmware_version": "2.8.2.0",
+    "manufacturer_id": 12288,
+    "nist_id": "1BADE0120F3E",
+    "address": 68
+  },
+  "csv": "C:\\repo\\ti-hdc-sensor-monitor\\outputs\\hardware-validation\\heater-validation_20260924_211940_043252.csv",
+  "pulse_duration_s": 5.046999999991385,
+  "baseline_temperature_c": 22.508583199816897,
+  "peak_heater_temperature_c": 23.144121461814294,
+  "final_temperature_c": 22.572671091783022,
+  "baseline_humidity_pct": 43.645380331120776,
+  "final_humidity_pct": 43.47600518806745,
+  "sample_count": 13,
+  "heater_on_sample_count": 2,
+  "completed_utc": "2026-09-24T21:19:54.562252+00:00"
+}

@@ -11,14 +11,11 @@ Python handling the **TI HDC3020EVM** through USB / USB2ANY HID.
 Modeled on [ti-tmp-sensor-monitor](https://github.com/cct1123/ti-tmp-sensor-monitor)
 using the same Dash interface conventions and single-session architecture.
 
-![HDC dashboard showing paired readings, statistics, synchronized history and active CSV recording in simulation](docs/images/monitor-overview.jpg)
-
-*Paired readings every second, independent channel statistics, synchronized plots,
-and CSV recording. All screenshots use this application's simulator; they do not
-demonstrate physical HDC3020EVM validation.*
-
-**Status:** physical acquisition, CSV, dashboard callbacks and non-heater controls
-passed on the HDC3020EVM. The heater pulse remains untested. See the
+**Status:** physical acquisition, CSV, live dashboard, volatile controls and one
+bounded test of the sensor's optional integrated heater passed on HDC3020EVMs.
+Automatic CSV start and daily rotation passed software/simulator checks and
+await review before a new physical check. Independent temperature/RH accuracy
+was not calibrated. See the
 [validation report](outputs/REPORT.md) and [current checkpoint](STATE.md).
 
 ## Quick start
@@ -45,32 +42,35 @@ per board. All browser tabs share that process's device session and recorder.
 - **Connect** opens and identifies the device without sampling. It establishes
   on-demand LPM0 with the heater off; these are volatile changes.
 - **Start monitoring** connects automatically or resumes. The default is a fresh
-  paired conversion each second. **Stop** pauses host acquisition; **Disconnect**
-  attempts heater-off and exit-auto, then releases the board.
+  paired conversion each second and automatic CSV capture. Uncheck **Save CSV
+  automatically while monitoring** before starting for a quick view without a
+  file. **Stop** pauses host acquisition; **Disconnect** drains the CSV, attempts
+  heater-off and exit-auto, then releases the board.
 - Live values show the last sample timestamp. Disconnected/paused readings are
   explicitly marked as retained. Statistics cover the entire 7,200-sample buffer.
 - The two plots share their time range. Drag or zoom either plot; **Follow live**
   returns to the last five minutes. **Clear data** clears only the in-memory buffer.
 
 See the [history walkthrough](docs/usage-guide.md#2-browse-history-and-return-to-live)
-for a screenshot of a held range and how to return to live following.
+for how to hold a time range and return to live following.
 
 ## Record, download, and export
 
-1. Click **Record** to log new samples under `recordings/`.
-2. Watch the filename, written-row count and dropped-row count in **CSV recording**.
-3. Click **Stop recording** and wait for the writer to finish.
-4. Click **Download last CSV** to download that file, or **Export buffer** to save
-   all samples currently held in memory without changing the recording state.
+1. Leave **Save CSV automatically while monitoring** checked. After a successful
+   **Start monitoring**, new samples go to `recordings/`. The writer opens a new
+   file on the first sample of each UTC day; older files remain in that folder.
+2. Watch the current filename, total written rows, file count and dropped rows in
+   **CSV recording**. **Stop** pauses sampling while leaving the file open.
+3. Click **Stop recording** to close the file while monitoring continues, or
+   **Disconnect** to drain it and release the board. **Download last CSV** is
+   available after the writer closes and downloads the most recent file.
+4. For a quick view without automatic saving, uncheck the option before starting.
+   **Record** starts a manual, non-rotating CSV when needed. **Export buffer**
+   saves only the samples currently held in memory.
 
-![Saved simulator CSV recording with row count, zero dropped rows, and enabled download and export controls](docs/images/csv-saved.jpg)
-
-*414 simulated pairs saved with zero dropped rows. After Stop recording, the status
-changes to Saved and Download last CSV becomes available.*
-
-Recording starts with new samples; it does not include earlier history. **Stop** pauses
-acquisition but leaves recording armed for a later resume. **Clear data** does not erase
-the file. Disk errors and dropped rows remain visible.
+Recording starts with new samples; it does not include earlier history. **Stop**
+pauses acquisition but leaves recording armed for a later resume. **Clear data**
+does not erase files. Disk errors and dropped rows remain visible.
 
 CSV pairs both channels with UTC timestamps, raw values, source and measurement settings.
 Plots use the computer's local time. Heater-on readings are marked in plots and CSV.
@@ -114,21 +114,22 @@ heater-off command succeeded.
 ## Verification
 
 ```bash
-uv run python -m unittest discover -s tests -v
-uv run --extra dev ruff check app.py hdcsensor tests
-uv run python -m hdcsensor.validate --samples 30
+uv run --locked --extra usb --extra dev python -m unittest discover -s tests -v
+uv run --locked --extra usb --extra dev ruff check .
+uv run --locked python -m hdcsensor.validate --samples 30
 ```
 
 The last command checks acquisition/CSV/reconnect in **simulation**. For the
 approved physical test procedure and its results, see
 [hardware validation](docs/hardware-validation.md) and the
-[validation report](outputs/REPORT.md). Heater-on validation remains outside
-the current approval scope.
+[validation report](outputs/REPORT.md). One attended heater pulse was validated
+under H015; no further pulse is authorized by that result. The automatic-CSV
+candidate still awaits its separate non-heater physical check.
 
 ## Documentation and references
 
 - [Quick start](docs/quick-start.md): five steps from connection to CSV download.
-- [Illustrated usage guide](docs/usage-guide.md): history, CSV, settings and recovery.
+- [Usage guide](docs/usage-guide.md): history, CSV, settings and recovery.
 - [Architecture](ARCHITECTURE.md): device ownership and background workers.
 - [Protocol](docs/protocol.md): HID framing, raw I²C, commands, CRC and conversion.
 - [HDC3020EVM](https://www.ti.com/tool/HDC3020EVM), [EVM user guide](https://www.ti.com/lit/pdf/snau267),

@@ -1,0 +1,22 @@
+{
+  "started_utc": "2026-09-24T21:19:08.618268+00:00",
+  "serial": "87F2A26E08002500",
+  "enumerated_serials": [
+    "47F3A26E27001D00",
+    "87F2A26E08002500"
+  ],
+  "identity": {
+    "source": "HDC3020EVM USB HID at 0x44",
+    "serial_number": "87F2A26E08002500",
+    "firmware_version": "2.8.2.0",
+    "manufacturer_id": 12288,
+    "nist_id": "1BADE0120F3E",
+    "address": 68
+  },
+  "status_word": "0x8010",
+  "identity_matches": true,
+  "heater_off": true,
+  "closed": true,
+  "completed_utc": "2026-09-24T21:19:08.780401+00:00",
+  "passed": true
+}

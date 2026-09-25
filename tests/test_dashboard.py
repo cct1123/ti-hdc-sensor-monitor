@@ -10,6 +10,7 @@ from test_session import wait_for
 
 from app import create_app
 from hdcsensor.acquisition import AcquisitionService
+from hdcsensor.errors import SensorError
 from hdcsensor.models import Sample
 from hdcsensor.ui.monitor import _local_time, _plot_range, history_figure
 
@@ -53,6 +54,7 @@ class DashboardTests(unittest.TestCase):
             "address.value": "0x44",
             "serial.value": "",
             "sample-interval.value": 1,
+            "auto-record.value": ["enabled"],
             "measurement-mode.value": "on_demand",
             "low-power.value": 0,
         }
@@ -130,6 +132,58 @@ class DashboardTests(unittest.TestCase):
         result = self.call("command-revision", "start-button.n_clicks", {"sample-interval.value": None})
         self.assertIn("Command failed", result["command-feedback"]["children"])
         self.assertEqual(self.service.session.snapshot().connection, "disconnected")
+
+    def test_auto_csv_starts_with_monitoring_and_closes_on_disconnect(self):
+        self.call("command-revision", "start-button.n_clicks")
+        wait_for(lambda: len(self.service.snapshot()) >= 2)
+        recorder = self.service.recorder.status()
+        self.assertTrue(recorder.recording)
+        self.assertIsNotNone(recorder.path)
+        self.call("command-revision", "stop-button.n_clicks")
+        wait_for(lambda: not self.service.session.snapshot().sampling)
+        self.assertTrue(self.service.recorder.status().recording)
+        self.call("command-revision", "start-button.n_clicks")
+        wait_for(lambda: len(self.service.snapshot()) >= 3)
+        self.assertEqual(self.service.recorder.status().path, recorder.path)
+        self.call("command-revision", "disconnect-button.n_clicks")
+        wait_for(lambda: self.service.session.snapshot().connection == "disconnected")
+        recorder = self.service.recorder.status()
+        self.assertFalse(recorder.recording)
+        self.assertEqual(recorder.file_count, 1)
+        self.assertEqual(recorder.dropped_rows, 0)
+        rows = list(csv.DictReader(io.StringIO(recorder.path.read_text(encoding="utf-8"))))
+        self.assertEqual(len(rows), len(self.service.snapshot()))
+
+    def test_auto_csv_opt_out_keeps_manual_record_available(self):
+        self.call("command-revision", "start-button.n_clicks", {"auto-record.value": []})
+        wait_for(lambda: len(self.service.snapshot()) >= 1)
+        self.assertIsNone(self.service.recorder.status().path)
+        self.call("command-revision", "record-start-button.n_clicks")
+        wait_for(lambda: self.service.recorder.status().recording)
+        self.call("command-revision", "disconnect-button.n_clicks")
+        wait_for(lambda: self.service.session.snapshot().connection == "disconnected")
+        self.assertFalse(self.service.recorder.status().recording)
+        self.assertTrue(self.service.recorder.status().path.exists())
+
+    def test_failed_connection_creates_no_auto_csv(self):
+        with patch("hdcsensor.simulation.SimulatedTransport.open", side_effect=SensorError("unavailable")):
+            self.call("command-revision", "start-button.n_clicks")
+            wait_for(lambda: self.service.session.snapshot().connection == "error")
+        self.assertIsNone(self.service.recorder.status().path)
+        self.assertEqual(list(Path(self.directory.name).glob("*.csv")), [])
+
+    def test_auto_csv_drains_after_measurement_error(self):
+        self.call("command-revision", "start-button.n_clicks")
+        wait_for(lambda: len(self.service.snapshot()) >= 1)
+        with (
+            patch.object(self.service.session, "_period", return_value=0.01),
+            patch("hdcsensor.simulation.SimulatedTransport.read", side_effect=SensorError("unplugged")),
+        ):
+            wait_for(lambda: self.service.session.snapshot().connection == "error")
+        recorder = self.service.recorder.status()
+        self.assertFalse(recorder.recording)
+        self.assertTrue(recorder.path.exists())
+        self.assertEqual(recorder.rows_written, len(self.service.snapshot()))
 
     def test_heater_acknowledgement_and_soft_reset_callbacks(self):
         self.call("command-revision", "connect-button.n_clicks")

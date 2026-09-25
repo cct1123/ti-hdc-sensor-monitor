@@ -155,8 +155,19 @@ def layout(simulation=False):
                                     id="sample-interval", type="number", value=1, min=1, max=60, step=0.1
                                 ),
                             ),
+                            dcc.Checklist(
+                                id="auto-record",
+                                options=[
+                                    {
+                                        "label": "Save CSV automatically while monitoring",
+                                        "value": "enabled",
+                                    }
+                                ],
+                                value=["enabled"],
+                                className="auto-record-option",
+                            ),
                             html.Div(
-                                "1 Hz by default. Live plots retain up to 7,200 paired samples.",
+                                "A new file starts with the first sample of each UTC day. Uncheck for a quick view without saving.",
                                 className="field-hint",
                             ),
                             html.Div(
@@ -331,6 +342,7 @@ def create_app(service=None, simulation=False, recording_directory=RECORDING_DIR
             State("address", "value"),
             State("serial", "value"),
             State("sample-interval", "value"),
+            State("auto-record", "value"),
             State("measurement-mode", "value"),
             State("low-power", "value"),
             State("heater-ack", "value"),
@@ -338,14 +350,19 @@ def create_app(service=None, simulation=False, recording_directory=RECORDING_DIR
         prevent_initial_call=True,
     )
     def handle_command(*args):
-        revision, backend, address, serial, interval, mode, lp, heater_ack = args[-8:]
+        revision, backend, address, serial, interval, auto_record, mode, lp, heater_ack = args[-9:]
         trigger = ctx.triggered_id
         revision = (revision or 0) + 1
         try:
             if trigger in ("start-button", "connect-button"):
                 sensor = create_sensor(backend, address, serial)
                 if trigger == "start-button":
-                    service.start(sensor, interval)
+                    service.start(
+                        sensor,
+                        interval,
+                        auto_record="enabled" in (auto_record or []),
+                        recording_directory=recording_directory,
+                    )
                 else:
                     service.session.connect(sensor, interval)
                 message = "Device request queued."
@@ -415,6 +432,7 @@ def create_app(service=None, simulation=False, recording_directory=RECORDING_DIR
         "address",
         "serial",
         "sample-interval",
+        "auto-record",
         "record-start-button",
         "record-stop-button",
         "download-button",
@@ -463,7 +481,10 @@ def create_app(service=None, simulation=False, recording_directory=RECORDING_DIR
         recording = "Not recording"
         if recorder.path:
             action = "Writer error" if recorder.last_error else "Recording" if recorder.recording else "Saved"
-            recording = f"{action}: {recorder.path.name} · {recorder.rows_written} rows · {recorder.dropped_rows} dropped"
+            recording = (
+                f"{action}: {recorder.path.name} · {recorder.rows_written} total rows "
+                f"across {recorder.file_count} file(s) · {recorder.dropped_rows} dropped"
+            )
         errors = " · ".join(x for x in (device.last_error, recorder.last_error) if x)
         details = "Connect to read device identity and status."
         if identity:
@@ -508,6 +529,7 @@ def create_app(service=None, simulation=False, recording_directory=RECORDING_DIR
             connected or busy,
             connected or busy,
             live or busy,
+            connected or busy,
             recorder.recording,
             not recorder.recording,
             not path_ready,

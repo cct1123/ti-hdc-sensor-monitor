@@ -1,0 +1,22 @@
+{
+  "started_utc": "2026-09-24T20:28:02.398496+00:00",
+  "probes": [
+    {
+      "serial": "47F3A26E27001D00",
+      "error": "SensorError: USB2ANY command 0x02: I2C address was not acknowledged",
+      "closed": true
+    },
+    {
+      "serial": "87F2A26E08002500",
+      "identity": {
+        "source": "HDC3020EVM USB HID at 0x44",
+        "serial_number": "87F2A26E08002500",
+        "firmware_version": "2.8.2.0",
+        "manufacturer_id": 12288,
+        "nist_id": "1BADE0120F3E",
+        "address": 68
+      },
+      "closed": true
+    }
+  ]
+}

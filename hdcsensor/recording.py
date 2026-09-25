@@ -22,6 +22,7 @@ class RecorderStatus:
     recording: bool
     path: Optional[Path]
     rows_written: int
+    file_count: int
     dropped_rows: int
     last_error: Optional[str]
 
@@ -40,6 +41,7 @@ class CsvRecorder:
         self._accepting = False
         self._path: Optional[Path] = None
         self._rows_written = 0
+        self._file_count = 0
         self._dropped_rows = 0
         self._last_error: Optional[str] = None
 
@@ -48,11 +50,12 @@ class CsvRecorder:
         cleaned = _SAFE_PREFIX.sub("_", prefix.strip()).strip("_")
         return cleaned[:64] or "hdc3020"
 
-    def start(self, output_directory: Path, prefix: str = "hdc3020") -> Path:
+    def start(self, output_directory: Path, prefix: str = "hdc3020", rotate_daily: bool = False) -> Path:
         output_directory = Path(output_directory).resolve()
         output_directory.mkdir(parents=True, exist_ok=True)
-        stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
-        path = output_directory / f"{self._clean_prefix(prefix)}_{stamp}.csv"
+        started = datetime.now(timezone.utc)
+        prefix = self._clean_prefix(prefix)
+        path = output_directory / f"{prefix}_{started:%Y%m%d_%H%M%S_%f}.csv"
 
         with self._lock:
             if self._thread is not None and self._thread.is_alive():
@@ -62,11 +65,12 @@ class CsvRecorder:
             self._accepting = True
             self._path = path
             self._rows_written = 0
+            self._file_count = 0
             self._dropped_rows = 0
             self._last_error = None
             thread = threading.Thread(
                 target=self._writer_loop,
-                args=(path,),
+                args=(path, prefix, started.date(), rotate_daily),
                 name="hdc-csv-writer",
                 daemon=False,
             )
@@ -87,28 +91,47 @@ class CsvRecorder:
                 self._dropped_rows += 1
                 return False
 
-    def _writer_loop(self, path: Path) -> None:
+    def _writer_loop(self, path: Path, prefix: str, day, rotate_daily: bool) -> None:
+        stream = None
         try:
-            with path.open("w", newline="", encoding="utf-8") as stream:
-                writer = csv.writer(stream)
-                writer.writerow(CSV_COLUMNS)
-                stream.flush()
-                while not self._stop_event.is_set() or not self._queue.empty():
-                    try:
-                        sample = self._queue.get(timeout=0.2)
-                    except queue.Empty:
-                        continue
-                    try:
-                        writer.writerow(sample_row(sample))
+            stream = path.open("x", newline="", encoding="utf-8")
+            writer = csv.writer(stream)
+            writer.writerow(CSV_COLUMNS)
+            stream.flush()
+            with self._lock:
+                self._file_count = 1
+            while not self._stop_event.is_set() or not self._queue.empty():
+                try:
+                    sample = self._queue.get(timeout=0.2)
+                except queue.Empty:
+                    continue
+                try:
+                    sample_day = sample.timestamp_utc.astimezone(timezone.utc).date()
+                    if rotate_daily and sample_day != day:
+                        stream.close()
+                        stream = None
+                        path = (
+                            path.parent
+                            / f"{prefix}_{sample.timestamp_utc.astimezone(timezone.utc):%Y%m%d_%H%M%S_%f}.csv"
+                        )
+                        stream = path.open("x", newline="", encoding="utf-8")
+                        writer = csv.writer(stream)
+                        writer.writerow(CSV_COLUMNS)
                         stream.flush()
+                        day = sample_day
                         with self._lock:
-                            self._rows_written += 1
-                    except Exception:
-                        with self._lock:
-                            self._dropped_rows += 1
-                        raise
-                    finally:
-                        self._queue.task_done()
+                            self._path = path
+                            self._file_count += 1
+                    writer.writerow(sample_row(sample))
+                    stream.flush()
+                    with self._lock:
+                        self._rows_written += 1
+                except Exception:
+                    with self._lock:
+                        self._dropped_rows += 1
+                    raise
+                finally:
+                    self._queue.task_done()
         except Exception as exc:  # the status must expose writer failures
             with self._lock:
                 self._last_error = f"{type(exc).__name__}: {exc}"
@@ -122,6 +145,13 @@ class CsvRecorder:
                         break
                     self._dropped_rows += 1
                     self._queue.task_done()
+        finally:
+            if stream is not None:
+                try:
+                    stream.close()
+                except Exception as exc:
+                    with self._lock:
+                        self._last_error = f"{type(exc).__name__}: {exc}"
 
     def stop(self, timeout: float = 5.0) -> None:
         with self._lock:
@@ -143,6 +173,7 @@ class CsvRecorder:
                 recording=self._thread is not None and self._thread.is_alive(),
                 path=self._path,
                 rows_written=self._rows_written,
+                file_count=self._file_count,
                 dropped_rows=self._dropped_rows,
                 last_error=self._last_error,
             )

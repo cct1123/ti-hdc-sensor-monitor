@@ -27,8 +27,10 @@ class DeviceSession:
         "sample",
     }
 
-    def __init__(self, on_sample, queue_size=32):
+    def __init__(self, on_sample, queue_size=32, on_connected=None, on_disconnected=None):
         self._on_sample = on_sample
+        self._on_connected = on_connected
+        self._on_disconnected = on_disconnected
         self._lock = threading.RLock()
         self._snapshot = DeviceSnapshot()
         self._thread = None
@@ -166,6 +168,8 @@ class DeviceSession:
         try:
             sensor.open()
             if not self._stop.is_set():
+                if self._on_connected is not None:
+                    self._on_connected(sampling)
                 self._publish_device(
                     sensor,
                     connection="connected",
@@ -240,6 +244,11 @@ class DeviceSession:
                 sensor.close()
             except Exception as exc:
                 failure = "; ".join(filter(None, (failure, str(exc))))
+            if self._on_disconnected is not None:
+                try:
+                    self._on_disconnected()
+                except Exception as exc:
+                    failure = "; ".join(filter(None, (failure, str(exc))))
             self._heater_deadline = None
             self._update(
                 connection="error" if failure else "disconnected",

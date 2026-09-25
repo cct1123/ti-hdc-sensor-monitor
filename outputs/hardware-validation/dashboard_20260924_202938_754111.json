@@ -1,0 +1,31 @@
+{
+  "backend": "usb_hid",
+  "physical_validation": true,
+  "passed": true,
+  "started_utc": "2026-09-24T20:29:38.754111+00:00",
+  "checks": {
+    "http_routes": true,
+    "physical_session": true,
+    "paired_live_values": true,
+    "paired_plots": true,
+    "recording_drained": true,
+    "recorded_pairs": true,
+    "buffer_export": true,
+    "saved_csv_download": true,
+    "settings_applied": true,
+    "settings_page": true,
+    "clean_disconnect": true
+  },
+  "errors": [],
+  "identity": {
+    "source": "HDC3020EVM USB HID at 0x44",
+    "serial_number": "87F2A26E08002500",
+    "firmware_version": "2.8.2.0",
+    "manufacturer_id": 12288,
+    "nist_id": "1BADE0120F3E",
+    "address": 68
+  },
+  "sample_count": 3,
+  "csv": "C:\\repo\\ti-hdc-sensor-monitor\\outputs\\hardware-validation\\hdc3020_20260924_202938_896427.csv",
+  "completed_utc": "2026-09-24T20:29:41.550570+00:00"
+}

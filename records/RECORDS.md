@@ -410,3 +410,168 @@ returned exactly `ae8a3f48bae58bb49e8702b8953cf6cd74762983` for
 `refs/heads/main`, matching local HEAD; the worktree was clean. This checkpoint
 record is a small follow-up commit. Publication does not alter the
 E022 heater-scope boundary or establish physical heater validation.
+
+## E027 - H011 software regression before new physical run (2026-09-24)
+`uv run --locked --extra usb --extra dev python -m unittest discover -s tests -v`
+passed 36/36 tests in 2.879 s on Python 3.12.13. `uv run --locked --extra usb
+--extra dev ruff check .` passed. This is software-only evidence; no real sensor
+was opened by these checks.
+
+## E028 - H012 board identification (2026-09-24)
+USB HID enumeration found two USB2ANY/OneDemo bridges: serials
+`47F3A26E27001D00` and `87F2A26E08002500`, neither the prior EVM serial.
+Sequential identity-only probe at HDC address 0x44 with 100 kHz I2C and
+bridge-managed pullups off: the first bridge NAKed the manufacturer command;
+the second returned CRC-valid manufacturer 0x3000, NIST ID `1BADE0120F3E`,
+firmware 2.8.2.0. Both handles closed. Full transcript:
+outputs/hardware-validation/identity_20260924.json. This identifies the second
+bridge for non-heater TEST-005; it does not establish calibration or heater scope.
+
+## E029 - H011 physical acquisition and CSV retest (2026-09-24)
+`uv run --locked --extra usb python -m hdcsensor.validate --hardware --serial
+87F2A26E08002500 --samples 30 --interval 1 --output
+outputs/hardware-validation` PASS. Report:
+outputs/hardware-validation/validation_20260924_202831_321522.json; paired CSV:
+outputs/hardware-validation/hardware-validation_20260924_202831_321522.csv.
+30 paired samples, median interval 0.999964 s (range 0.982464–1.013803 s),
+zero failed reads, zero recording loss, exact CSV/buffer match, clean disconnect,
+same NIST identity after reopen, clean final close. This is physical communication
+and timing evidence, not independent temperature/RH accuracy calibration.
+
+## E030 - H011 physical Dash callback retest (2026-09-24)
+`uv run --locked --extra usb python -m hdcsensor.validate_dashboard --hardware
+--serial 87F2A26E08002500 --output outputs/hardware-validation` PASS. Report:
+outputs/hardware-validation/dashboard_20260924_202938_754111.json; CSV:
+outputs/hardware-validation/hdc3020_20260924_202938_896427.csv. Actual HTTP
+callbacks showed a connected heater-off session, paired live values/plots,
+three recorded pairs, drained CSV, matching buffer export and last-file
+download, auto 1 Hz/LPM1 setting application and clean disconnect. Browser
+visual rendering is a separate check.
+
+## E031 - H011 live browser inspection and clean shutdown (2026-09-24)
+Launched `uv run --locked --extra usb python app.py --port 8050` and opened
+127.0.0.1:8050 in the in-app browser. With USB serial `87F2A26E08002500`,
+the page showed Connected/Monitoring, heater off, paired values about 22.7 °C
+and 43 %RH, min/mean/max, zero failed reads, and both aligned trend plots.
+Plot scrolling switched to held history; Follow live restored the live view.
+The UI recorded and drained seven rows with zero dropped to
+outputs/hardware-validation/hdc3020_20260924_203112_357249.csv (copied from
+the app's recordings directory). The UI then showed Saved, 7 rows, 0 dropped;
+Stop paused sampling, Disconnect showed "Disconnected; heater disabled."
+Ctrl+C ended the app; no listener remained on port 8050 and no repo Python/uv
+process remained. These are browser and normal-operation observations, not an
+accuracy calibration or a heater-on test.
+
+## E032 - H015 preflight identity and heater-off check (2026-09-24)
+After H014 retained the optional HDC3020 integrated-heater control and H015
+approved one exact pulse, a fresh preflight enumerated two USB2ANY bridges and
+opened only serial `87F2A26E08002500`. CRC-valid manufacturer 0x3000 and NIST
+ID `1BADE0120F3E` matched E028; firmware was 2.8.2.0, status was 0x8010
+with heater bit 13 off, and the handle closed. PASS transcript:
+outputs/hardware-validation/heater-preflight_20260924.json. No heater-on
+command was issued during preflight.
+
+## E033 - H015 single physical integrated-heater pulse (2026-09-24)
+Under the exact H015 scope, ran `uv run --locked --extra usb python -m
+hdcsensor.validate_heater --hardware --confirm-attended --serial
+87F2A26E08002500 --output outputs/hardware-validation` once. PASS report:
+outputs/hardware-validation/heater_20260924_211939_857607.json; paired CSV:
+outputs/hardware-validation/heater-validation_20260924_211940_043252.csv.
+Starting identity matched E032 and heater status was off. Minimum element
+0x0001 status turned on, stayed on while sampling paused, and automatically
+cleared after 5.047 s; final status read was off. Of 13 CRC-valid paired
+samples, two carried heater-on flags and the final CSV flag was off. Baseline,
+heater-on peak and final temperature were 22.509, 23.144 and 22.573 °C;
+baseline/final RH were 43.645/43.476 %RH. The result is consistent with
+cooldown toward baseline, without an accuracy or calibrated thermal claim.
+Plot markers and CSV flags matched; zero failed reads, zero recording loss,
+clean disconnect, no errors. The process exited. No repeated pulse occurred.
+
+## E034 - Final integrated evidence review (2026-09-24)
+Reviewed the current-board 30-sample acquisition/CSV report (E029), physical
+Dash callback and browser check (E030/E031), earlier-board all-mode non-heater
+controls (E017), and approved current-board heater check (E033). Each JSON
+report was PASS with zero false checks and zero errors. The heater CSV has
+13 rows, two heater-on rows, and a final off row. E027's 36 software tests
+and Ruff passed; `git diff --name-only -- app.py hdcsensor tests pyproject.toml
+uv.lock` was empty, so these software results apply to the current runtime.
+`git diff --check` passed. Runtime configuration and safe shutdown are documented
+in docs/quick-start.md and docs/hardware-validation.md. REQ-001–006 have
+relevant current PASS evidence; independent temperature/RH accuracy calibration
+was never an acceptance criterion. One board was used for all-mode controls
+and another of the same model for the core/browser/heater tests; that scope
+remains visible in STATE.md and outputs/REPORT.md.
+After updating the final report and usage/protocol notes, a local Markdown-link
+check passed, the stale pending/untested status scan found no acceptance-status
+contradiction, and `git diff --check` remained clear. No runtime files changed.
+
+## E035 - H016 automatic CSV software and simulator validation (2026-09-24)
+
+`uv run --locked --extra usb --extra dev python -m unittest discover -s tests -v`
+passed 42/42 in 5.935 s. Added checks cover automatic recording only after a
+successful Start monitoring connection, pause/resume in the same file, opt-out
+with manual Record, failed connection without an auto file, writer drain after
+measurement failure, UTC-day rollover without lost boundary rows, and visible
+rollover-open error. Ruff check and format check passed (`38 files already
+formatted`); `git diff --check` passed. All are software-only tests.
+
+In an in-app browser at `127.0.0.1:8051`, the simulator displayed the checked
+auto-save control and a live CSV filename. After seven paired samples, the UI
+showed `7 total rows across 1 file(s)`, zero dropped; Stop left the writer
+active and Disconnect changed its status to Saved and enabled Download last
+CSV. The resulting simulator CSV has seven UTC-timestamped paired rows, first
+`2026-09-24T21:48:38.545986+00:00`, last
+`2026-09-24T21:48:44.544372+00:00`. The local simulator process exited. This
+visual/software check did not open either real USB2ANY bridge.
+
+## E036 - H016 candidate review and hardware boundary (2026-09-24)
+
+Reviewed the changed Dash callback, AcquisitionService lifecycle,
+DeviceSession callbacks and CSV writer against REQ-004/006. The H016 writer
+starts after sensor.open returns and before first sampling; disconnect/error
+drains it; sample timestamps determine UTC-day rollover. Manual Record uses the
+existing non-rotating path. Existing heater and USB transport code were not
+changed. The 38-file normalized snapshot is
+`outputs/auto-record-candidate-manifest.json`, SHA256
+`dfb421645b9aee068e59a39969cdab747bc8a02fbc7f2ad03d37a232f62f6916`.
+The report and docs/hardware-validation.md give expected behavior, a bounded
+non-heater physical procedure, and recovery. This candidate is hardware-ready,
+but H007's approval applied to a prior source snapshot and H015's one heater
+pulse has been consumed. Physical REQ-004 and affected REQ-006 integration
+remain UNTESTED pending explicit review of this new candidate.
+
+## E037 - H017 device-setup copy removal (2026-09-24)
+
+Removed only the "1 Hz by default. Live plots retain up to 7,200 paired
+samples." helper line from `app.py` Device setup. The interval input still
+defaults to 1 s and the 7,200-pair buffer remains configured. The exact GUI
+string is absent; Ruff check and format check for `app.py` passed, as did
+`git diff --check`. No device or browser interaction was needed for this copy
+change. The revised 38-file H016 candidate snapshot is
+`outputs/auto-record-candidate-manifest.json`, SHA256
+`89b03160ea53e179ea5e528eefec2a0b4a2fe51a9b321d8507b4b70eb233b068`.
+The H016 physical review gate remains pending; E036's earlier digest is
+superseded for that review.
+
+## E038 - H018 documentation and publication review (2026-09-25)
+
+Updated README and guides for automatic CSV capture, UTC-day rollover,
+manual non-rotating files, file download after writer close, and disconnect
+drain. Corrected the stale statement that heater-on had never been physically
+tested: E033 documents one H015-approved pulse, with no authorization for
+another. Three tracked simulator screenshots showed the H017-removed helper
+note and lacked the H016 auto-save control; removed their current documentation
+links and pruned those exact images. Retained the current settings screenshot,
+user-supplied EVM photo, all dated historical evidence, `tmp` scripts,
+`.venv`, and recordings. Removed only verified generated `__pycache__` and
+`.ruff_cache` directories.
+
+`uv run --locked --extra usb --extra dev python -m unittest discover -s tests
+-v` passed 42/42 in 6.007 s. Ruff check and format check passed (38 Python
+files). A local Markdown-target check found 51 targets and zero missing.
+Current-board TEST-005, dashboard and heater report JSON each state PASS with
+no errors, and paired CSV row counts match the reported 30, 3 and 13 samples.
+No device was opened in H018. The revised 38-file normalized candidate
+manifest SHA256 is
+`df446d86b47c266b8e0a554411e5a9bca112178700217719707094c444aaee97`.
+The H016 non-heater physical check remains pending candidate approval.

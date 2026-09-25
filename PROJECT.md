@@ -5,6 +5,11 @@ User request, 2026-09-20, recorded as H001 in records/HUMAN_INPUTS.md.
 Build a local Python dashboard closely modeled on cct1123/ti-tmp-sensor-monitor.
 V1 priority: connect -> acquire paired temperature/RH at about 1 Hz -> live plots -> CSV logging.
 Then implement measurement mode, LPM, heater, status read/clear, soft reset, and device/NIST identity.
+The HDC3020EVM is a temperature and relative-humidity sensor evaluation board.
+The HDC3020's integrated heater is an optional sensor feature, not the board's
+primary purpose; keep it off during normal monitoring. H013 clarified this
+framing, and H014 retained its control as an acceptance criterion. H015 approved
+one bounded physical pulse for validation on the identified board.
 
 ## Observable acceptance criteria
 - REQ-001: Direct USB/USB2ANY HID connection to HDC3020EVM; bounded timeouts, exact framing,
@@ -12,8 +17,13 @@ Then implement measurement mode, LPM, heater, status read/clear, soft reset, and
 - REQ-002: CRC-checked temperature and RH from the same conversion at roughly 1 Hz.
   Reject short/corrupt/not-ready responses; use TI's 16-bit conversion formula.
 - REQ-003: Live paired values, min/mean/max, bounded history and synchronized plots with pan/zoom/follow.
-- REQ-004: Start/stop CSV logging, drained accepted rows, visible disk/queue errors, last-file download
-  and current-buffer export, UTC timestamps, paired readings and configuration metadata.
+- REQ-004: Automatically start CSV logging with successful monitoring unless
+  the operator opts out; rotate to a new file on the first accepted sample of
+  each UTC day, without dropping paired samples at the boundary. Keep manual
+  Record/Stop for quick checks. Drain and close files on disconnect/shutdown;
+  show filename, row/drop counts and disk/queue errors; provide last-file
+  download and current-buffer export with UTC timestamps, paired readings and
+  configuration metadata. H016 supplies this extension.
 - REQ-005: Basic volatile controls and CRC-checked status/manufacturer/NIST identity.
 - REQ-006: A single session worker owns all device I/O; tests cover lifecycle, serialization,
   bad responses, disconnect, command failures and recording; reuse reference architecture/UI.

@@ -1,0 +1,4 @@
+timestamp_utc,sequence,temperature_c,relative_humidity_pct,source,raw_temperature,raw_humidity,mode,low_power,heater_on
+2026-09-24T20:29:39.100920+00:00,1,22.615396,43.215076,HDC3020EVM USB HID at 0x44,25321,28321,on_demand,0,0
+2026-09-24T20:29:40.109656+00:00,2,22.636759,43.225757,HDC3020EVM USB HID at 0x44,25329,28328,on_demand,0,0
+2026-09-24T20:29:41.106577+00:00,3,22.636759,43.233387,HDC3020EVM USB HID at 0x44,25329,28333,on_demand,0,0

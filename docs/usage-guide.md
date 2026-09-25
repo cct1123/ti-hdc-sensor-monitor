@@ -1,18 +1,18 @@
-# Illustrated usage guide
+# Usage guide
 
-Follow **start → inspect → record → adjust settings → disconnect**. For the
-shortest first-use path, see the [quick start](quick-start.md). Screenshots were
-captured from this application's simulator on Windows. Values, USB identity and
-NIST serial in the images are simulated; physical acquisition, CSV, dashboard
-callbacks and non-heater controls later passed on the EVM (see the
-[validation report](../outputs/REPORT.md)).
+Follow **Start monitoring → inspect readings and CSV → adjust settings →
+Disconnect**.
+
+For the shortest first-use path, see the [quick start](quick-start.md). The
+settings screenshot uses this application's simulator; its identity values are
+fixtures. Physical acquisition, manual CSV, the live dashboard and volatile
+controls passed on HDC3020EVMs, while automatic CSV still awaits a physical
+check. See the [validation report](../outputs/REPORT.md).
 
 ## 1. Inspect the monitor
 
 Start with the [quick start](quick-start.md), then watch the temperature/RH
 pair update about once a second. The header shows the current connection state.
-
-![Simulator acquiring paired readings, updating statistics and history, and recording new samples](images/monitor-overview.jpg)
 
 Check these four places:
 
@@ -26,8 +26,9 @@ at the default interval; older pairs roll out as new ones arrive. **Clear data**
 the buffer and statistics but does not remove recordings.
 
 **Connect** identifies the board and selects on-demand LPM0 with heater off;
-**Start monitoring** begins acquisition. Heater-on testing still requires
-separate scope under the [hardware validation procedure](hardware-validation.md).
+**Start monitoring** begins acquisition and, by default, CSV capture. Leave
+the optional heater off during normal monitoring; the [hardware validation
+procedure](hardware-validation.md) describes its earlier bounded test.
 
 ## 2. Browse history and return to live
 
@@ -40,10 +41,8 @@ Their time axes remain synchronized, so changes can be compared at the same inst
    range stays fixed while new samples arrive.
 4. Click **Follow live · 5 min** to restore the latest five-minute view.
 
-![Synchronized temperature and humidity plots with a selected historical time range held while monitoring continues](images/history-held.jpg)
-
-*History · view held identifies a selected range. Both plots use the same time range;
-statistics still describe the entire buffer.*
+**History · view held** identifies a selected range. Both plots use the same
+time range; statistics still describe the entire buffer.
 
 **Stop** pauses acquisition. The last values and timestamp remain visible, labeled
 as retained. **Start monitoring** resumes. In auto mode, Stop pauses host reads only;
@@ -51,21 +50,30 @@ the sensor keeps converting until on-demand mode is selected or you Disconnect.
 
 ## 3. Record and export CSV
 
-Click **Record** while monitoring. New samples go to a timestamped file such as
-`recordings/hdc3020_YYYYMMDD_HHMMSS_ffffff.csv`. Earlier samples are available through
-**Export buffer**, but are not backfilled into the recording.
+By default, **Start monitoring** begins CSV capture after a successful connection.
+New samples go to a timestamped file such as
+`recordings/hdc3020_YYYYMMDD_HHMMSS_ffffff.csv`. The writer starts a new file
+on the first accepted sample of each UTC day. Earlier daily files remain in
+`recordings/`; samples from before recording began are not backfilled.
+
+Uncheck **Save CSV automatically while monitoring** before starting for a quick
+view without a file. You can still click **Record** to begin a manual capture;
+manual recordings stay in one file until stopped.
+If you click **Stop recording** while monitoring continues, later samples are
+not saved until **Record** or the next **Start monitoring**. **Stop** pauses
+sampling but keeps an active recording open for resume; **Disconnect** drains
+and closes it.
 
 Click **Stop recording** to finish the file. The writer drains accepted rows before
 **Download last CSV** becomes available. Confirm **Saved**, the written-row count,
 and **0 dropped** before using the recording.
 
-![A completed simulated CSV recording, with saved filename and row count and enabled download controls](images/csv-saved.jpg)
-
 | Action | Data included | Effect on recording |
 | --- | --- | --- |
-| **Record** | New samples after recording starts | Starts a new file. |
+| **Start monitoring** with auto-save checked | New samples after successful connection | Starts a daily-rotated recording. |
+| **Record** | New samples after manual recording starts | Starts a non-rotating file when auto-save is off or stopped. |
 | **Stop recording** | All rows accepted before stopping | Drains and closes the file. |
-| **Download last CSV** | The latest completed recording | None. |
+| **Download last CSV** | The latest file after recording stops; earlier daily files remain in `recordings/` | None. |
 | **Export buffer** | A snapshot of all currently buffered pairs | None. |
 | **Clear data** | Removes buffered pairs from the UI | The file remains; recording can continue. |
 
@@ -125,16 +133,18 @@ markers and `heater_on=1` identify heater-on samples, which remain in statistics
 Allow cooldown before interpreting ambient readings.
 
 The host timer runs even while sampling is paused. USB failure or a stopped host
-cannot guarantee shutdown: unplug the board if heater-off is uncertain. Physical
-heater testing requires explicit scope under the hardware gate. These screenshots
-keep the heater off.
+cannot guarantee shutdown: unplug the board if heater-off is uncertain. One
+minimum-element physical pulse passed under H015's attended scope (E033); that
+test does not authorize routine heating in other setups. The settings
+screenshot keeps the heater off.
 
 ## 5. Finish a session
 
-1. Click **Stop recording** and wait for **Saved**.
-2. Download the file if needed.
-3. Click **Disconnect** to attempt heater-off/exit-auto and release the device.
-4. Stop the server with **Ctrl+C** in its terminal.
+1. Click **Disconnect** to drain the CSV, attempt heater-off/exit-auto and
+   release the device. Wait for **Saved** in the recording status.
+2. Download the latest file if needed; earlier daily files remain in
+   `recordings/`.
+3. Stop the server with **Ctrl+C** in its terminal.
 
 Closing a browser tab does not stop the Python process or its session. **Stop** alone
 also keeps the device open. Disconnect before opening TI's GUI or another hardware

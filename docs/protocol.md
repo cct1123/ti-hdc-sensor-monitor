@@ -67,8 +67,9 @@ self-heating recommendation of no faster than one measurement per second.
 Status `F32D`, clear tracking/reset flags `3041`, soft reset `30A2` (20 ms wait).
 Status bit 13 indicates heater enabled. Heater off `3066`, on `306D`, configuration
 `306E` + CRC-protected word, checked by readback. UI uses only `0001`, a minimum
-heater element, with a five-second host timer. Timing/current/temperature behavior
-is unverified on physical hardware.
+heater element, with a five-second host timer. One attended physical pulse lasted
+5.047 s with status-on/off and a transient temperature rise (E033); heater
+current and calibrated thermal behavior were not measured.
 
 Manufacturer `3781` returns `3000` with CRC. NIST serial is three CRC-protected
 words read with `3683`, `3684`, `3685`, joined MSB first into a 48-bit hex string.

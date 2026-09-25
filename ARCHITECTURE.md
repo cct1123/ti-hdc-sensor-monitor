@@ -39,6 +39,13 @@ failure count lost rows and expose an error. Stop blocks acceptance, drains
 accepted rows and joins the writer. Download is unavailable while the writer is
 alive, including after a stop timeout. A process crash cannot promise durability
 beyond the OS filesystem cache; this is a local monitor, not a transactional logger.
+With auto-save selected, the session's successful connection starts the CSV
+writer before the first sample. A failed connection creates no automatic file.
+The writer rotates on the first accepted sample of each new UTC day, so a pause
+across midnight produces the next file only when sampling resumes. The UI shows
+the current file, cumulative row/file counts, drops and writer errors. Disconnect
+or unexpected session termination drains and closes the writer. Opting out leaves
+the manual Record/Stop controls available.
 
 ## UI reuse
 
