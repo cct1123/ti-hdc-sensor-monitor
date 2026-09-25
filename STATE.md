@@ -1,9 +1,9 @@
 # Current checkpoint
 
 Phase: **AWAITING_HUMAN_REVIEW** (H016/H019/H020 revised candidate)
-Checkpoint: 2026-09-25 14:29 America/Chicago, H020 software review complete
+Checkpoint: 2026-09-25 14:31 America/Chicago, H020 publication verified
 Last applied human input: H020
-Owner: released at 2026-09-25 14:29 America/Chicago.
+Owner: released at 2026-09-25 14:31 America/Chicago.
 Staleness window 24 h, after checking task liveness.
 
 ## Current result
@@ -79,6 +79,8 @@ and its remote ref independently verified (E041).
 H020 adds one identity-checked HID reopen after the first failed sample on
 Start/Resume, only with heater off. Its failure behavior and CSV continuity
 pass software tests; the user's exact button/cable sequence is unconfirmed.
+The H020 source commit `93cc0db840d755bdb6681b0841c82c19bd602952`
+was pushed to `origin/main` and independently verified (E043).
 
 ## Human action required
 

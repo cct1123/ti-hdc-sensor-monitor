@@ -674,3 +674,14 @@ or write was performed in H020. The revised 38-file normalized candidate
 manifest is `outputs/auto-record-candidate-manifest.json`, SHA256
 `550ce489168e64a03720c953add6d3ddbb671547ff103105d42d2b68200a88bc`.
 Physical reconnect and auto-CSV behavior remain UNTESTED pending review.
+
+## E043 - H020 reconnect candidate publication (2026-09-25)
+
+Committed the 15 explicitly staged source, fake-HID/simulator tests, guide,
+candidate manifest and checkpoint files as
+`93cc0db840d755bdb6681b0841c82c19bd602952` after cached diff check.
+Confirmed the configured `origin/main` was the prior verified checkpoint
+`d2ced3a6b65b997356e36ae941ce46a2be2a766a`; a scan of added lines
+found no credential markers, personal paths or email addresses. Pushed the
+commit to that same GitHub remote; independent `git ls-remote` returned the
+full H020 commit SHA above. Publication does not approve a physical test.
