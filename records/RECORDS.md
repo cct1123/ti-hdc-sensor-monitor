@@ -575,3 +575,19 @@ No device was opened in H018. The revised 38-file normalized candidate
 manifest SHA256 is
 `df446d86b47c266b8e0a554411e5a9bca112178700217719707094c444aaee97`.
 The H016 non-heater physical check remains pending candidate approval.
+
+## E039 - H018 source and evidence publication (2026-09-25)
+
+Committed the 32 explicitly staged source, documentation, manifest and dated
+physical-evidence paths as `b0cb8a2cf290029d5c225d6272be3f0a021a7847`.
+The commit removed three verified stale simulator screenshots; preserved the
+real EVM reports/CSVs and the remaining current images. Before push,
+`origin/main` matched `e5f2856eacdc1cd7f3695800551df49502b3be3e`.
+The first push request was rejected by automatic approval review due to
+uncertainty about the external remote and hardware metadata. A focused check
+confirmed the same configured GitHub origin previously used in E026, no
+credential or private user-home path in the changed payload, and only EVM
+identity/readings plus repo-local paths in the new reports. The same
+`git push origin main` was then approved and fast-forwarded to `b0cb8a2`.
+Independent `git ls-remote origin refs/heads/main` returned the full commit
+SHA above. Publication is not H016 physical candidate approval.

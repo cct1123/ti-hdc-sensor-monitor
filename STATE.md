@@ -1,9 +1,9 @@
 # Current checkpoint
 
 Phase: **AWAITING_HUMAN_REVIEW** (H016 automatic daily CSV candidate)
-Checkpoint: 2026-09-25 10:33 America/Chicago, H018 publication review
+Checkpoint: 2026-09-25 10:37 America/Chicago, H018 publication verified
 Last applied human input: H018
-Owner: current Codex session since 2026-09-25 10:27 America/Chicago for H018 documentation and publication.
+Owner: released at 2026-09-25 10:37 America/Chicago.
 Staleness window 24 h, after checking task liveness.
 
 ## Current result
@@ -68,7 +68,8 @@ snapshot is `outputs/auto-record-candidate-manifest.json`, SHA256
 `df446d86b47c266b8e0a554411e5a9bca112178700217719707094c444aaee97`
 (E038). H017 removed the sample-interval helper note without changing the
 configured interval or buffer. H018 updated the guides and pruned three stale
-simulator screenshots; the snapshot is local and not yet published. The prior
+simulator screenshots; commit `b0cb8a2cf290029d5c225d6272be3f0a021a7847`
+was pushed to `origin/main` and independently verified (E039). The prior
 physical E029–E033 results apply to the older runtime, not the new auto-save
 path.
 
@@ -86,12 +87,12 @@ No heater pulse is requested; H015's single pulse is complete.
 
 ## Loop continuity
 
-In-flight operation: none. H016 implementation and independent validation are
-complete (E035/E036/E038). H018 authorizes documentation cleanup and Git
-publication only; publish the reviewed source/evidence, then stay at the review
-gate until approval of the above candidate and scope is recorded as a new H
-entry. After approval, run the bounded physical CSV check, regress affected
-failures if any, and update REQ-004/006 status.
+In-flight operation: none. The H018 source and evidence commit was published
+and remote `refs/heads/main` verified equal to
+`b0cb8a2cf290029d5c225d6272be3f0a021a7847` (E039). H016 implementation
+and independent validation are complete (E035/E036/E038). Stay at the review
+gate until approval of the candidate and scope is recorded as a new H entry.
+Then run the bounded physical CSV check and update REQ-004/006 status.
 The H015 TEST-006 was performed exactly once, with
 final status off and clean disconnect (E033). The runner process exited.
 The H011/H012 identity, acquisition, Dash callback and live browser checks
