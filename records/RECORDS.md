@@ -619,3 +619,18 @@ The updated 38-file normalized H016/H019 candidate manifest is
 all listed file hashes and the candidate digest were independently recomputed.
 No real HID enumeration or physical command was run under H019; H016's revised
 candidate still requires review before a physical test.
+
+## E041 - H019 diagnostic commit publication (2026-09-25)
+
+Committed the ten explicitly staged H019 code, test, guide, candidate and
+checkpoint files as `19fd5f24b638f3ee95cc7923b9e450b03e7e9f58` after
+`git diff --cached --check` passed. The first `git push origin main` request
+was rejected by automatic approval review because destination and payload
+authorization were not yet established. No push started; `git ls-remote`
+still showed `80b4c1a032367f944fd87bfde4832ff1c334047a`. The configured
+origin is the same GitHub repository used in H018/E039. A changed-file review
+showed only the ten focused paths; the EVM USB serial was already in the
+published baseline. A scan of added lines found no credential markers,
+personal paths or email addresses. The retry was approved and fast-forwarded
+`origin/main` to `19fd5f2`; independent `git ls-remote` returned the full SHA
+above. This publication is not physical-candidate approval.

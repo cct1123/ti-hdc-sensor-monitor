@@ -1,9 +1,9 @@
 # Current checkpoint
 
 Phase: **AWAITING_HUMAN_REVIEW** (H016/H019 revised candidate)
-Checkpoint: 2026-09-25 11:35 America/Chicago, H019 software review complete
+Checkpoint: 2026-09-25 11:39 America/Chicago, H019 publication verified
 Last applied human input: H019
-Owner: released at 2026-09-25 11:35 America/Chicago.
+Owner: released at 2026-09-25 11:39 America/Chicago.
 Staleness window 24 h, after checking task liveness.
 
 ## Current result
@@ -73,7 +73,9 @@ was pushed to `origin/main` and independently verified (E039). The prior
 physical E029–E033 results apply to the older runtime, not the new auto-save
 path. H019 improved USB selection/timeout feedback, with 44 software tests
 passing. The user's explicit serial works by report; the bridge enumerated
-during the blank-serial failure is unknown (E040).
+during the blank-serial failure is unknown (E040). The focused source commit
+`19fd5f24b638f3ee95cc7923b9e450b03e7e9f58` was pushed to `origin/main`
+and its remote ref independently verified (E041).
 
 ## Human action required
 
