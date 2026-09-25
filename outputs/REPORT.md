@@ -40,7 +40,9 @@ only after the first HID failure following Start/Resume, verifies the same
 USB/NIST identity before volatile writes, restores measurement mode, and keeps
 the CSV file open. Later HID failures stop immediately. No automatic reopen
 occurs during a heater pulse. Software tests cover these paths (E042); the
-user's exact Disconnect-button versus cable sequence remains unconfirmed.
+user has confirmed they did not click the dashboard's **Disconnect** button
+before this event (E044). A stale retained handle is consistent with that
+sequence; the native HID cause remains unmeasured.
 The previous H007/H010 physical results do not validate the new auto-save path.
 
 First validated device: one Texas Instruments USB2ANY/OneDemo HID bridge, VID:PID

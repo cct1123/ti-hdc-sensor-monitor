@@ -1,9 +1,9 @@
 # Current checkpoint
 
 Phase: **AWAITING_HUMAN_REVIEW** (H016/H019/H020 revised candidate)
-Checkpoint: 2026-09-25 14:31 America/Chicago, H020 publication verified
-Last applied human input: H020
-Owner: released at 2026-09-25 14:31 America/Chicago.
+Checkpoint: 2026-09-25 14:39 America/Chicago, H021 clarification reconciled
+Last applied human input: H021
+Owner: released at 2026-09-25 14:39 America/Chicago.
 Staleness window 24 h, after checking task liveness.
 
 ## Current result
@@ -78,7 +78,9 @@ during the blank-serial failure is unknown (E040). The focused source commit
 and its remote ref independently verified (E041).
 H020 adds one identity-checked HID reopen after the first failed sample on
 Start/Resume, only with heater off. Its failure behavior and CSV continuity
-pass software tests; the user's exact button/cable sequence is unconfirmed.
+pass software tests; the user confirmed **Disconnect** was not clicked before
+the reported device reconnect (E044). A stale retained handle is consistent
+with the report, but the native HID failure cause was not measured.
 The H020 source commit `93cc0db840d755bdb6681b0841c82c19bd602952`
 was pushed to `origin/main` and independently verified (E043).
 
@@ -90,9 +92,8 @@ non-heater automatic-CSV and reconnect check on HDC3020EVM USB serial
 covered an older candidate. On approval, verify identity/heater-off anew,
 run the short Start/Stop/resume/Disconnect CSV procedure, and have the operator
 perform one USB cable unplug/replug while monitoring is stopped to exercise
-H020 as documented in docs/hardware-validation.md. Return the button/cable
-sequence used in the original failure if known, and the resulting UI status,
-error text, CSV row count and device identity from this check. No heater pulse
+H020 as documented in docs/hardware-validation.md. Return the resulting UI
+status, error text, CSV row count and device identity from this check. No heater pulse
 is requested; H015's single pulse is complete.
 
 ## Loop continuity
@@ -100,8 +101,8 @@ is requested; H015's single pulse is complete.
 In-flight operation: none. H020 screenshot shows `hid_write=-1` on repeated
 measurement and shutdown commands after a stopped/reconnected device. Stop
 pauses sampling but retains the HID handle; a USB replug can invalidate it.
-E042/D005 document a bounded software recovery and 50-test PASS. The exact
-button/cable sequence remains unconfirmed, and no physical probe is authorized
+E042/D005 document a bounded software recovery and 50-test PASS. H021 confirms
+the dashboard Disconnect button was not used, and no physical probe is authorized
 for this revised candidate. H019 reports `-49` on blank serial while two
 bridges are attached and explicit serial succeeds. Under current code, two
 enumerated bridges produce an ambiguity error before I2C. The observed HID

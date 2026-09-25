@@ -685,3 +685,14 @@ Confirmed the configured `origin/main` was the prior verified checkpoint
 found no credential markers, personal paths or email addresses. Pushed the
 commit to that same GitHub remote; independent `git ls-remote` returned the
 full H020 commit SHA above. Publication does not approve a physical test.
+
+## E044 - H021 reconnection sequence clarification (2026-09-25)
+
+The user confirmed that they did not use the dashboard **Disconnect** button
+before the H020 reconnect failure. The source-confirmed behavior is that
+**Stop** keeps the DeviceSession and HID handle open; H020's `-1` write occurred
+after the reported device disconnect/reconnect. A stale handle is therefore a
+stronger explanation, but the specific native HIDAPI error and physical USB
+state at the time were not captured. This is user-reported sequence evidence,
+not physical validation of the revised recovery code. E042's 50-test software
+result and the H016/H019/H020 candidate review gate remain unchanged.

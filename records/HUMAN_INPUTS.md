@@ -167,3 +167,12 @@ dashboard's Disconnect control, unplugged USB, or both is pending clarification.
 Diagnose the lifecycle and improve REQ-001/006 recovery and error reporting.
 This report does not approve real-device testing of a changed candidate or
 another heater pulse; retain the hardware review gate.
+
+## H021 - Confirm no dashboard Disconnect before reconnect (2026-09-25, user in this task)
+
+In response to the H020 sequence question, the user stated: "I didn't use the
+disconnect button." Thus the dashboard session was not explicitly closed
+before the reported device disconnect/reconnect. This strengthens the stale
+HID-handle explanation for the later `hid_write=-1`, while the exact physical
+transport failure is still not measured. The clarification does not approve
+running the H020 candidate on hardware or repeating a heater pulse.
